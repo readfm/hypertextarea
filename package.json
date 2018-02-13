@@ -1,0 +1,23 @@
+{
+  "name": "init",
+  "productName": "init",
+  "description": "Initiate all the rest",
+  "scripts": {
+    "start": "electron ."
+  },
+  "version": "0.1.0",
+  "main": "main.js",
+  "dat_key": "004a997f535ae919c2e308ce18a74ee1571912cd0ecb4072bc90daa8f21af424",
+  "dependencies": {
+    "dat-node": "^3.5.8",
+    "electron-packager": "^11.0.0",
+    "js-yaml": "^3.10.0",
+    "npm": "^5.6.0",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "electron": "^1.8.2",
+    "electron-winstaller": "^2.6.4"
+  },
+  "electronVersion": "1.8.2"
+}

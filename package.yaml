@@ -1,0 +1,5 @@
+window:
+  frame: false
+  width: 200
+  height: 90
+  file: index.html
