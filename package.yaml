@@ -1,5 +1,9 @@
+---
 window:
+  openDevTools: true
+  icon: logo.ico
   frame: false
-  width: 200
-  height: 90
-  file: index.html
+  titleBarStyle: hiddenInset
+  width: 1800
+  height: 400
+  title: pix8

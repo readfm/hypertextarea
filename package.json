@@ -1,13 +1,12 @@
 {
-  "name": "init",
-  "productName": "init",
-  "description": "Initiate all the rest",
+  "name": "pix8",
+  "productName": "pix8",
+  "description": "Better images, faster",
   "scripts": {
     "start": "electron ."
   },
   "version": "0.1.0",
-  "main": "main.js",
-  "dat_key": "004a997f535ae919c2e308ce18a74ee1571912cd0ecb4072bc90daa8f21af424",
+  "main": "exec.js",
   "dependencies": {
     "dat-node": "^3.5.8",
     "electron-packager": "^11.0.0",
