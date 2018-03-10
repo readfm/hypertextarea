@@ -167,6 +167,7 @@ global.Data = {
 
       var headers = {
         'Cache-Control': 'no-cache, must-revalidate',
+        'Access-Control-Allow-Origin': '*'
       };
 
       res.writeHead(200, headers);
