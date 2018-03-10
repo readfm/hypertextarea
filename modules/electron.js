@@ -22,16 +22,16 @@ $(ev => {
       window.maximize();
     else
       window.unmaximize();
-  }).html('&sdotb;').appendTo($header);
+  }).html('&#9744;').appendTo($header);
   $("<button>", {id: 'pic8-close'}).click(ev => {
     window.close();
-  }).html('&times;').appendTo($header);
+  }).html('&#10005;').appendTo($header);
 
 
   var $resize = $("<div id='pic-resize'></div>");
 	$resize.appendTo($pic)
 
-  Pix.carousel('pix8');
+  Pix.carousel('pix8test2');
   Site.resize();
 
   var $tag = Pix.$tag = $("<input id='pic-tag'/>").appendTo($resize);
@@ -55,4 +55,14 @@ $(ev => {
     else if (e.which === 116)
       location.reload();
   });
+
+  $(document).on('click', 'a[target="_blank"]', function (event){
+    event.preventDefault();
+    console.log(this);
+    require('electron').shell.openExternal(this.href);
+  });
+});
+
+$(ev => {
+  Context.init();
 });

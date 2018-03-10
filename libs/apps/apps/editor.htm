@@ -1,0 +1,145 @@
+<link href="/design/textEditor.css" rel="stylesheet" type="text/css">
+
+<div id='textEditor' class='app'>
+	<footer>
+		<button class='admin' id='textEditor-save'>Save</button>
+
+		<button class='fr' id='textEditor-cleanStyle'>Clean style</button>
+		<input class='fr' id='textEditor-column_width' placeholder='&#xF035;' place='Column width'/>
+
+		<div class='slider' style='float: right'>
+			<span class='sl' style='left: 18px'></span>
+		</div>
+	</footer>
+	
+	<article id='textEditor-data' class='txt'></article>
+</div>
+
+<div id="editor" class='o' style='display: none'>
+	<button style='font-weight: bold' onclick="document.execCommand('bold', false, null)">B</button>
+	<button style='font-style: italic' onclick="document.execCommand('italic', false, null)">I</button>
+	<button style='text-decoration:underline' onclick="document.execCommand('underline', false, null)">U</button>
+	
+	<button class='fa fa-list-ul' onclick="document.execCommand('InsertUnorderedList', false, null)"></button>
+	<button class='fa fa-list-ol' onclick="document.execCommand('InsertOrderedList', false, null)"></button>
+	<button class='fa fa-indent' onclick="document.execCommand('indent', false, null)"></button>
+	<button class='fa fa-dedent' onclick="document.execCommand('outdent', false, null)"></button>
+
+	<button onclick="document.execCommand('FormatBlock', false, 'h1')">H1</button>
+	<button onclick="document.execCommand('FormatBlock', false, 'h2')" style='font-size: 11px'>H2</button>
+	<button onclick="document.execCommand('FormatBlock', false, 'h3')" style='font-size: 8px'>H3</button>
+	
+	<button onclick="document.execCommand('insertHorizontalRule', false, null)">__</button>
+</div>
+
+<script>
+
+window.TextEditor = {
+	load: function(item){
+		TextEditor.item = item;
+		var adm = (Acc.user && (item.owner == Acc.user.id || Acc.user.super));
+		$('#textEditor .admin')[q.sh(adm)]();
+		$('#textEditor-data').html('').data('id', item.file || false).attr('contentEditable',adm);
+		Site.openApp('textEditor');
+		Tree.activate(item.id);
+
+		if(item.file)
+			ws.download(item.file).then(function(data, file){
+				var text = new TextDecoder("utf-8").decode(data);
+				$('#textEditor-data').html(text);
+			}, 'text');
+	},
+
+	save: function(){
+		if(TextEditor.item.file)
+			ws.upload($('#textEditor-data').html(), function(file){
+				console.log(file);
+				$('#textEditor-save').blink('green');
+			}, {id: TextEditor.item.file});
+		else
+			ws.upload($('#textEditor-data').html(), function(file){
+				if(file){
+					$('#textEditor-save').blink('green');
+					ws.send({
+						cmd: 'update',
+						collection: 'tree',
+						set: {
+							file: file.id
+						},
+						id: TextEditor.item.id
+					});
+
+					TextEditor.item.file = file.id;
+					$('#t'+TextEditor.item.id).data('file', file.id);
+				}
+				else{
+					$('#textEditor-save').blink('red');
+				}
+			});
+	},
+
+	nFonts: 20,
+	minFont: 5,
+	changeFont: function(prc){
+		$('article:visible').css('font-size', (TextEditor.minFont + TextEditor.nFonts * prc)+'px');
+	}
+};
+
+Tree.types.text = TextEditor.load;
+
+$(function(){
+	$editor = $('#editor');
+	var hide = true;
+
+	$editor.mousedown(function(){
+		hide = false;
+	});
+
+	$('#textEditor-save').click(function(){
+		TextEditor.save();
+	});
+
+	$('#textEditor-cleanStyle').click(function(){
+		$('#textEditor-data *').removeAttr('style class id');
+	});
+
+	$('#textEditor-column_width').bindEnter(function(){
+		var w = parseInt(this.value);
+		$('#textEditor-data').css('column-width', w || '');
+	});
+
+	$('article').focus(function(){
+		$editor.slideDown('fast');
+	}).blur(function(){
+		var $article = $(this);
+		if(hide){
+			$editor.slideUp('fast');
+			
+		}
+		else
+			hide = true;
+	});
+	
+	$('#html-save').click(function(){
+		var $ed = $('article:visible').eq(0);
+		
+		if($ed.length)
+			$.post('catalog/item/desc',{id: $ed.data('id'), type: $ed.data('type'), desc: $ed.html()},function(r){
+				$ed.html(r.desc)
+			});
+	});
+	
+	$('#btn-htmlShow').click(function(){
+		editor.modal();
+	});
+
+	
+	$('#textEditor .slider').slider();
+	TextEditor.changeFont($('#textEditor .slider').data('prec'));
+
+	$('#textEditor .slider>.sl').drag(function(){
+		TextEditor.changeFont($(this).parent().data('prec'));
+	});
+
+});
+</script>

@@ -1,12 +1,18 @@
 window.Cfg = {
 	//server: '10.0.0.29:81/',
 	server: 'io.cx/',
+
+	Data: {
+		host: 'http://127.0.0.1',
+		port: 8083
+	},
+
 	//server: 'taitis.com',
 	//server: 'localhost',
 	//server: document.location.host,
 	local_server: '127.0.0.1:81',
 	defaultYoutube: 'ME4NUY5a-4M&t=52.4;8',
-	files: 'http://f.io.cx/',
+	files: 'http://127.0.0.1:8083/',
 	//files: 'http://files.lh/',
 	//thumber: 'http://thumb.lh/',
 	thumber: 'http://thumb.pix8.co/',

@@ -7,8 +7,6 @@ global.Electron = require('electron');
 const YAML = require('js-yaml');
 const require_yaml = path => YAML.safeLoad(fs.readFileSync(path, 'utf8'));
 
-var conf = require_yaml('package.yaml');
-
 
 global.Main = {
   open(cfg_window){
@@ -26,6 +24,8 @@ global.Main = {
   path: __dirname,
   path_dat: Path.join(require('os').homedir(), 'Desktop', 'dat'),
 }
+
+var conf = require_yaml(Path.join(Main.path, 'package.yaml'));
 
 if(process.versions['electron']){
   Electron.app.on('ready', function(){

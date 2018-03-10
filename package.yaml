@@ -1,7 +1,7 @@
 ---
 window:
-  openDevTools: true
-  icon: logo.ico
+  openDevTools: false
+  icon: icon.ico
   frame: false
   titleBarStyle: hiddenInset
   width: 1800

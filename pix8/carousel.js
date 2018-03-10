@@ -1257,15 +1257,12 @@ Carousel.prototype = {
 		this.$t[0].addEventListener('dragover', cancel);
 		this.$t[0].addEventListener('dragenter', cancel);
 		this.$t[0].addEventListener('drop', function(ev){
-			/*
+			/*] */
 			console.log(ev);
 			console.log(ev.dataTransfer.files);
-			console.log(ev.dataTransfer.getData('Text'));
-			console.log(ev.dataTransfer.getData('text/plain'));
 
 			if(ev.dataTransfer.files.length)
 				return t.upload(ev);
-			*/
 
 			var txt = ev.dataTransfer.getData('URL') || ev.dataTransfer.getData('Text');
 
@@ -1316,6 +1313,10 @@ Carousel.prototype = {
 
 			// Closure to capture the file information.
 			reader.onload = function(ev){
+				console.log(ev.target.result);
+
+				//Data.save(ev.target.result).then();
+				return;
 				ipfs.add(Buffer.from(ev.target.result)).then(function(r){
 					if(!r || !r.length) return;
 
@@ -1428,6 +1429,92 @@ Carousel.prototype = {
 								carousel.supportEvents($item);
 								carousel.updateView();
 							}
+						});
+					});
+				}
+				reader.readAsArrayBuffer(lf);
+			};
+			reader.readAsDataURL(f);
+		};
+
+		ev.preventDefault();
+		return false;
+	},
+
+	upload: function(ev, $before){
+		var files;
+		if(ev.type == 'drop')
+			files = ev.dataTransfer.files; // FileList object
+		else
+		if(ev.type == 'paste')
+			files = (ev.clipboardData || ev.originalEvent.clipboardData).items;
+
+		var carousel = this;
+		// Loop through the FileList and render image files as thumbnails.
+		for (var i = 0, f; f = files[i]; i++){
+			// Only process image files.
+			console.log(f);
+
+
+			if (f.kind === 'file'){
+				f = f.getAsFile();
+				console.log(f);
+			}
+
+			if(!f.type.match('image.*'))
+				continue;
+
+			var reader = new FileReader();
+
+			var lf = f;
+			// Closure to capture the file information.
+			reader.onload = function(ev1){
+				var item = {
+					src: ev1.target.result,
+					type: 'image'
+				};
+
+				var $item = Pix.build(item);
+				$item.addClass('uploading');
+
+				if($before)
+					$item.insertBefore($before);
+				else
+				if(ev.target.src)
+					$item.insertBefore(ev.target.parentNode);
+				else
+					carousel.$t.append($item);
+
+				carousel.resize($item);
+
+				var reader = new FileReader();
+				reader.onload = function(ev2){
+					Data.saveFile(ev2.target.result).then(id => {
+						console.log(id);
+						if(!id) return $item.remove();
+
+						var img = $item.children('img')[0];
+
+						var item = {
+							src: Cfg.Data.host+':'+Cfg.Data.port + '/' + id,
+							file: id,
+							width: img.naturalWidth,
+							height: img.naturalHeight,
+							path: carousel.getPath(),
+							//tag: carousel.$tag.val(),
+							type: 'image'
+						};
+
+						Data.save(item).then(item => {
+							$item.removeClass('uploading');
+							$item.data(item);
+							$item.attr({
+								id: 'image-'+item.id
+							});
+
+							carousel.resize($item);
+							carousel.supportEvents($item);
+							carousel.updateView();
 						});
 					});
 				}

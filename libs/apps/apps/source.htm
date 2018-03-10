@@ -1,0 +1,239 @@
+<div id='source-themes' class='tip tip-top'></div>
+<div id='source' class='app'>
+	<footer>
+		<button class='pg' id='source-saveObject'>Save</button>
+		<button class='admin' id='source-save'>Save</button>
+		<button class='admin' id='source-upload'>Upload</button>
+		
+		<button class='fr' id='source-download'>Download</button>
+		<button class='fr' id='source-theme'>Theme</button>
+		<button class='fr' id='source-tab'>New tab</button>
+		<button class='fr' id='source-openSite'>Open site</a>
+	</footer>
+	
+	<script src='/lib/codemirror.js'></script>
+	<link href='/design/codemirror.css' rel="stylesheet"/>
+	<link href='/design/source.css' rel="stylesheet"/>
+	<script src='/lib/CM-modes/javascript.js'></script>
+	<script src='/lib/CM-modes/xml.js'></script>
+	<script src='/lib/CM-modes/css.js'></script>
+	<script src='/lib/CM-modes/htmlmixed.js'></script>
+	<script src='/lib/CM-modes/yaml.js'></script>
+	
+	<input id='upl-source' type="file" name="file" class='pg'/>
+
+</div>
+
+<script>
+window.codeMirror = CodeMirror(document.getElementById('source'),{
+	lineNumbers: true,
+	lineWrapping: true,
+	matchBrackets: false,
+	indentWithTabs: true,
+	smartIndent: false,
+	tabSize: 3,
+	indentUnit: 3,
+	onCursorActivity: function(){
+		codeMirror.setLineClass(hLine, null, null);
+		//hLine = codeMirror.addLineClass(codeMirror.getCursor().line, null, "activeLine");
+	}
+});
+
+window.Source = {
+	defaultValue: '\n\n\n\n\n\n\n\n\n',
+	open: function(item){
+		Tree.activate(item.id);
+		Site.openApp('source');
+
+		codeMirror.clearHistory();
+		codeMirror.focus();
+		codeMirror.setValue(Source.defaultValue);
+		codeMirror.setValue('  ');
+
+		var ext = (Tree.ext.exec(item.name || '')[1] || '').toLowerCase();
+
+		if(item.type == 'site')
+			codeMirror.setOption('mode', 'htmlmixed');
+		if(ext == 'js' || ext == 'json')
+			codeMirror.setOption('mode', 'javascript');
+		else if(['htm','html'].indexOf(ext)+1)
+			codeMirror.setOption('mode', 'htmlmixed');
+		else if(['xml','svg'].indexOf(ext)+1)
+			codeMirror.setOption('mode', 'xml');
+		else if(ext == 'css')
+			codeMirror.setOption('mode', 'css');
+		else if(['yml','yaml'].indexOf(ext)+1)
+			codeMirror.setOption('mode', 'yaml');
+
+		var admin = Acc.user && Acc.user == item.owner;
+		codeMirror.setOption('readOnly', admin);
+
+		$('#source-download').showIf(item.file);
+		$('#source-saveObject').hide();
+
+
+		var admin = Acc.user && (Acc.user.id == item.owner || Acc.user.super);
+		$('#source .admin').showIf(admin);
+		$('#source-download').showIf(item.file && admin);
+		$('#source-openSite').showIf(item.type == 'site');
+
+		if(item.file)
+			ws.download(item.file).then(function(data, file){
+				//Source.data = String.fromCharCode.apply(null, data);
+
+				Source.data = new TextDecoder("utf-8").decode(data);
+
+				codeMirror.focus();
+				codeMirror.setValue(Source.data || '');
+			});
+		else setTimeout(function(){
+			codeMirror.refresh();
+		}, 90);
+	},
+
+	openObject: function(id, collection){
+		Site.openApp('source');
+
+		codeMirror.clearHistory();
+		codeMirror.focus();
+		codeMirror.setValue(Source.defaultValue);
+		codeMirror.setValue('');
+
+		codeMirror.setOption('mode', 'yaml');
+
+		$('#source-download, #source-save, #source-openSite').hide();
+		var q = {id: id};
+		if(collection) q.collection = collection;
+		Source.collection4object = collection || 'tree';
+		$.query('/tree/serialize', q, function(r){
+			codeMirror.setValue(r.yaml || '');
+			$('#source-saveObject').show();
+		});
+	},
+
+	save: function(){
+		var item = $('#tree .av').data();
+		Tree.put(item, codeMirror.getValue(), function(){
+			$('#source-save').blink('green')
+		});
+	},
+
+	saveObject: function(item){
+		$('#source-download, #source-save, #source-openSite').hide();
+		var q = {yaml: codeMirror.getValue(), collection: Source.collection4object};
+		$.query('/tree/save', q, function(r){
+			$('#source-saveObject').blink((r.item)?'green':'red');
+
+			if(!q.collection || q.collection == 'tree'){
+				var $prp = $('#tree .av');
+				if($prp.length)
+					$prp.replaceWith(Tree.build(r.item).addClass('av'));
+			}
+		});
+	},
+
+	loadTheme: function(name){
+		codeMirror.setOption("theme", name);
+		var path = Cfg.libs+'CM_themes/'+name+'.css';
+		if($('link[path="'+path+'"]').length) return;
+		$('<link>', {
+			type: 'text/css', 
+			rel: 'stylesheet',
+			href: path
+		}).appendTo('head');
+	}
+}
+
+$(function(){
+	var hLine;
+	
+	
+
+	//hLine = codeMirror.addLineClass(0, "activeLine");;
+
+	function saveSource(){
+		Source.save();
+		return false;
+	};
+
+
+	$('#source-theme').tip({
+		id: 'source-themes',
+		ba: function(){
+			if($('#source-themes > div').length) return;
+
+			ws.send({
+				cmd: 'load',
+				filter: {
+					tid: Cfg.ids.themes
+				}
+			}, function(r){
+				(r.items || []).forEach(function(item){
+					var nameA = item.name.split('.');
+					nameA.pop();
+					var name =  nameA.join('.');
+					$('<div>').data(item).text(name).appendTo('#source-themes');
+				});
+
+				$('#source-themes > div').click(function(){
+					var name = this.textContent
+					var item = $(this).data();
+					Source.loadTheme(name);
+					Cookies.set('theme', name);
+				});
+			});
+		},
+		pos: 't'
+	});
+
+	var theme = Cookies.get('theme');
+	if(theme) Source.loadTheme(theme);
+
+
+
+	$('#source-tab').click(function(){
+		var item = $('#tree .av').data();
+		window.open(Cfg.sourceEditor+'#'+item.id, '_blank');
+	});
+
+	$('#source-openSite').click(function(){
+		var item = $('#tree .av').data();
+		if(!item.domain) return;
+		window.open('http://'+item.domain, '_blank');
+	});
+
+	//$(window).bind('keydown', 'Ctrl+s', saveSource);
+
+	$('#source-save').click(saveSource);
+	$('#source-saveObject').click(Source.saveObject);
+
+	$('#source-upload').click(function(){
+		$('#upl-source').click();
+	});
+
+	$('#upl-source').bind('change', function(evt){	
+		var reader = new FileReader();
+		reader.readAsText(evt.target.files[0]);
+		
+		reader.onloadend = function(){
+			codeMirror.setValue(reader.result);
+		}
+	});
+
+	$('#source-download').click(function(ev){
+		var item = $('#tree .av').data('file');
+		document.location = '/' + item.file;
+	});
+
+	$('#switchAdm').click(function(){
+		if($('#source').is(':visible') | $('.pg:not(#switchAdm)').hide())
+			$('#tool').html(codeMirror.getValue()).show().find('.check').click(ev.check);
+		else{
+			$('#source').show();
+			codeMirror.focus();
+		}
+	});
+});
+
+Tree.types.source = Source.open;
+</script>

@@ -5,13 +5,15 @@ global.Data = {
     //this.init_ipfs();
     if(!FS.existsSync(this.dir))
       FS.mkdirSync(this.dir);
+
+    this.serve(Cfg.Data.port);
   },
 
   init_ipfs: function(){
 
   },
 
-  generate_id: () => randomString(5),
+  generate_id: () => randomString(8),
 
   save: function(item){
     return new Promise((resolve, reject) => {
@@ -56,6 +58,24 @@ global.Data = {
     }
   },
 
+  saveFile: function(buf){
+    console.log(buf);
+    return new Promise((resolve, reject) => {
+      var id = Data.generate_id(),
+          path = Path.join(this.dir, id);
+
+      try{
+        FS.writeFileSync(path, Buffer.from(buf));
+      }
+      catch(err){
+        console.error(err);
+        return reject(err);
+      }
+
+      resolve(id);
+    });
+  },
+
   append: function(id, line){
     var path = Path.join(this.dir, id+'.log');
     FS.appendFileSync(path, "\n"+line);
@@ -74,6 +94,10 @@ global.Data = {
 
       resolve(itm);
     });
+  },
+
+  share: function(){
+
   },
 
   loadSync: function(id){
@@ -122,7 +146,38 @@ global.Data = {
     else return;
 
     return item
-  }
+  },
+
+  serve: function(port){
+    require('http').createServer((req, res) => {
+    	var Url = require('url').parse(req.url),
+    	    uri = decodeURI(Url.pathname).replace(/^\/+|[^A-Za-z0-9_.:\/~ @-]|\/+$/g, '');
+    	const p = uri.split(/[\/]+/);
+
+      var path = Path.join(this.dir, p[0]);
+
+      try{
+        var stat = FS.lstatSync(path);
+      } catch(e){
+        console.error(e);
+        res.writeHead(404);
+        res.end();
+        return;
+      }
+
+      var headers = {
+        'Cache-Control': 'no-cache, must-revalidate',
+      };
+
+      res.writeHead(200, headers);
+      var readStream = FS.createReadStream(path);
+      readStream.pipe(res);
+    }).listen(port || Cfg.Data.port);
+  },
+
+	pump: function(res){
+
+	},
 };
 
 Data.init();

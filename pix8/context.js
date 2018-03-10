@@ -14,13 +14,17 @@ window.Context = {
     */
 
     $('<a>', {id: 'pic-context-open', class: 'option', target: '_blank'}).text('Open').appendTo($menu);
-    $('<a>', {id: 'pic-context-newTab', class: 'option', target: '_blank'}).text('Open in newTab').appendTo($menu);
+    //$('<a>', {id: 'pic-context-newTab', class: 'option', target: '_blank'}).text('Open in newTab').appendTo($menu);
     $('<a>', {id: 'pic-context-youtube', class: 'option', target: '_blank'}).text('Open in Youtube').appendTo($menu);
 
 
-    $('<div>', {id: 'pic-context-copy', class: 'option'}).click(ev => {
-    }).text('Copy').appendTo($menu);
+    $('<div>', {id: 'pic-context-copy', class: 'option'}).click(function(ev){
+      var item = $('.thumb').data();
+      require('electron').clipboard.writeText(item.src);
+      tip.hide();
+    }).text('Copy URL').appendTo($menu);
 
+    /*
     $('<div>', {id: 'pic-context-share', class: 'option'}).click(ev => {
     }).text('Share').appendTo($menu);
 
@@ -54,18 +58,15 @@ window.Context = {
 
     $('#pic-context-youtube').showIf(item.youtube_id).attr('href', 'http://youtu.be/'+item.youtube_id);
     $('#pic-context-newTab').showIf(item.path).attr('href', item.path);
+    $('#pic-context-copy').showIf(item.src).data('src', item.src);
     $('#pic-context-open').showIf(item.segments || item.src).attr('href', item.segments?('http://ggif.me/'+item.id):item.src);
 
     console.log(item);
 
 
     Context.$menu.css({
-      top: pos.top + $item.height(),
+      top: pos.top + 9,
       left: pos.left
     }).show();
   }
 }
-
-$(ev => {
-  Context.init();
-});
