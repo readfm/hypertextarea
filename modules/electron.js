@@ -13,19 +13,24 @@ $(ev => {
   $("<div>", {id: 'pic8-title'}).appendTo($header);
 
 
+  $("<button>", {id: 'pic8-close'}).click(ev => {
+    window.close();
+  }).html('&#10005;').appendTo($header);
+
+
+    /*
+    $("<button>", {id: 'pic8-maximize'}).click(ev => {
+      if(!window.isMaximized())
+        window.maximize();
+      else
+        window.unmaximize();
+    }).html('&#9744;').appendTo($header);
+    */
+    
   var window = require('electron').remote.getCurrentWindow();
   $("<button>", {id: 'pic8-minimize'}).click(ev => {
     window.minimize();
   }).html('&minus;').appendTo($header);
-  $("<button>", {id: 'pic8-maximize'}).click(ev => {
-    if(!window.isMaximized())
-      window.maximize();
-    else
-      window.unmaximize();
-  }).html('&#9744;').appendTo($header);
-  $("<button>", {id: 'pic8-close'}).click(ev => {
-    window.close();
-  }).html('&#10005;').appendTo($header);
 
 
   var $resize = $("<div id='pic-resize'></div>");

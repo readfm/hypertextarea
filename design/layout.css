@@ -274,3 +274,7 @@ body{
     height: auto;
     z-index: 177;
 }
+
+#pic8-minimize, #pic8-maximize, #pic8-close{
+    float: right;
+}
