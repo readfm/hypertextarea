@@ -1,5 +1,9 @@
+const FS = require('fs');
+const Path = require('path');
+const YAML = require('js-yaml');
+
 global.Data = {
-  items: [],
+  items: {},
   dir: Path.join(require('os').homedir(), 'Desktop', 'myItems'),
   init: function(cfg){
     //this.init_ipfs();
@@ -7,6 +11,8 @@ global.Data = {
       FS.mkdirSync(this.dir);
 
     this.serve(Cfg.Data.port);
+
+    console.log('Module data was initiated');
   },
 
   init_ipfs: function(){
@@ -181,4 +187,16 @@ global.Data = {
 	},
 };
 
-Data.init();
+module.exports = Data;
+
+API.get = (m, q, re) => {
+  Data.load(m.id).then(r => {
+    re(r);
+  });
+};
+
+API.save = (m, q, re) => {
+  Data.save(m.item).then(r => {
+    re(r);
+  });
+};

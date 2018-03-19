@@ -1,9 +1,0 @@
----
-window:
-  openDevTools: false
-  icon: icon.ico
-  frame: false
-  titleBarStyle: hiddenInset
-  width: 1800
-  height: 400
-  title: pix8

@@ -1,31 +1,44 @@
 global._ = require('underscore');
+const fs = require('fs');
+const clc = require('clc');
+const Path = require('path');
 
-const path = require('path'),
-      fs = require('fs');
-global.YAML = require('js-yaml');
-global.Dat = require('dat-node');
-
-global.Package = require('./package.json');
-global.NPM = require('npm');
 global.Electron = require('electron');
 
+require('./misc.js');
+
+global.Cfg = require_yaml('./config.yaml');
+
+global.API = {};
+
+require('./neuro.js');
+
+Cfg.modules.forEach(name => Neuro.loadModule(name));
+Object.keys(Neuro.modules).forEach(name => {
+  var module = Neuro.modules[name];
+
+  if(typeof module.init == 'function'){
+    console.log('Init: ', name);
+    module.init();
+  }
+});
+
+process.emit('modules_ready');
+
 if(process.versions['electron']){
-  Electron.app.on('ready', function(){
-    var app_index = path.join(__dirname, 'index.js'), app;
-    console.log(app_index);
-    if(fs.existsSync(app_index))
-      app = require(app_index);
-
-    Dat(__dirname, {key: Package.dat_key}, (err, dat) => {
-      dat.joinNetwork(() => {
-        if(!app) dat.archive.readFile(app_index, (err, content) => {
-          require(app_index);
-        });
-      });
-    });
+  (Cfg.electronSwitches || []).forEach(option => {
+    if (typeof option === 'string')
+      Electron.app.commandLine.appendSwitch(option);
+    else
+      Electron.app.commandLine.appendSwitch(option[0], option[1]);
   });
 
-  Electron.app.on('window-all-closed', () => {
-    Electron.app.quit();
-  });
-}
+  Electron.app.on('ready', () => Neuro.run(process.argv[2] || Cfg.default_app));
+};
+
+var stdin = process.openStdin();
+stdin.setEncoding('utf8');
+
+stdin.on('data', function (input){
+	console.log(eval(input));
+});

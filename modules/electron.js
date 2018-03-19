@@ -1,73 +1,59 @@
-$("<link>", {
-  "rel" : "stylesheet",
-  "type" :  "text/css",
-  "href" : "electron.css"
-}).appendTo('head');
+const path = require('path'),
+      fs = require('fs'),
+      yaml = require('js-yaml'),
+      url = require('url'),
+      {app, BrowserWindow} = require('electron');
 
 
-$(ev => {
-  var $pic = Pix.$pic = $("<div>", {id: 'pic', class: 'bar'}).prependTo('body');
+global.Electron = exports = {
+  active: {},
+  createWindow: function(name){
+    console.log('Creating window: ', name);
 
-  var $header = $("<div>", {id: 'pix8-header'}).prependTo($pic);
-  $("<button>", {id: 'pic8-openMenu'}).html("&#8803").appendTo($header);
-  $("<div>", {id: 'pic8-title'}).appendTo($header);
+    var makePath = file => path.join(App.path, 'static', name, file);
 
+    var cfg_path = makePath('app.yaml'),
+        cfg_text = fs.existsSync(cfg_path)? fs.readFileSync(cfg_path, 'utf8'):null,
+        cfg = _.extend(Cfg.electron.window, yaml.safeLoad(cfg_text));
 
-  $("<button>", {id: 'pic8-close'}).click(ev => {
-    window.close();
-  }).html('&#10005;').appendTo($header);
+    console.log(cfg);
 
+    let win = this.active[name] = new BrowserWindow(cfg.window);
 
-    /*
-    $("<button>", {id: 'pic8-maximize'}).click(ev => {
-      if(!window.isMaximized())
-        window.maximize();
-      else
-        window.unmaximize();
-    }).html('&#9744;').appendTo($header);
-    */
-    
-  var window = require('electron').remote.getCurrentWindow();
-  $("<button>", {id: 'pic8-minimize'}).click(ev => {
-    window.minimize();
-  }).html('&minus;').appendTo($header);
+    win.loadURL(makePath('index.html'));
 
+    if(cfg.openDevTools)
+      win.webContents.openDevTools();
 
-  var $resize = $("<div id='pic-resize'></div>");
-	$resize.appendTo($pic)
+    win.setMenu(null);
 
-  Pix.carousel('pix8test2');
-  Site.resize();
+    win.on('closed', () => {
+      win = this.active[name] = null;
+    });
+  },
 
-  var $tag = Pix.$tag = $("<input id='pic-tag'/>").appendTo($resize);
-  $tag.bindEnter(function(){
-    Pix.carousel(this.value);
-    this.value = '';
-  }).click(function(){
-    $tag.focus();
-  });
+  init: function(){
+    var that = this;
+    // Quit when all windows are closed.
 
+    app.on('ready', () => {
+      that.createWindow(process.argv[2] || Cfg.default_app || 'home');
+    });
 
-  $(window).resize(function(event){
-    var $lastCarousel = $('#pic > .carousel').last();
-    $lastCarousel.height($lastCarousel.height() + document.body.clientHeight - $('#pic').height());
-    $lastCarousel[0].carousel.resize();
-  });
+    app.on('window-all-closed', () => {
+      // On macOS it is common for applications and their menu bar
+      // to stay active until the user quits explicitly with Cmd + Q
+      if (process.platform !== 'darwin') {
+        app.quit();
+      }
+    })
 
-  document.addEventListener("keydown", e => {
-    if (e.which === 123)
-      require('remote').getCurrentWindow().toggleDevTools();
-    else if (e.which === 116)
-      location.reload();
-  });
-
-  $(document).on('click', 'a[target="_blank"]', function (event){
-    event.preventDefault();
-    console.log(this);
-    require('electron').shell.openExternal(this.href);
-  });
-});
-
-$(ev => {
-  Context.init();
-});
+    app.on('activate', () => {
+      // On macOS it's common to re-create a window in the app when the
+      // dock icon is clicked and there are no other windows open.
+      if (win === null) {
+        that.createWindow(Cfg.default_app)
+      }
+    });
+  }
+};

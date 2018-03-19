@@ -1,0 +1,25 @@
+---
+modules: [socket, data]
+default_app: pix8me
+developer_mode: true
+
+port: 5030
+
+socket:
+  port: 3000
+
+
+Data:
+  host: http://127.0.0.1
+  port: 8083
+
+electronSwitches:
+  # 'enable-tcp-fastopen'
+  - enable-experimental-canvas-features
+  - enable-experimental-web-platform-features
+  - enable-overlay-scrollbars
+  # 'enable-hardware-overlays'
+  # 'enable-universal-accelerated-overflow-scroll'
+  # 'allow-file-access-from-files'
+  # 'allow-insecure-websocket-from-https-origin'
+  - ['js-flags', '--harmony_collections']
