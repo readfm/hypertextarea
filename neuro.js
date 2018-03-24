@@ -5,6 +5,11 @@ const Path = require('path');
 global.Neuro = {
   path: __dirname,
 
+  init: function(){
+    global.Sesions = this.Sessions = {};
+    global.API = this.API = {};
+  },
+
   apps: {},
   run: function(name){
     var app = this.apps[name] = {

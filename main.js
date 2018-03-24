@@ -9,9 +9,8 @@ require('./misc.js');
 
 global.Cfg = require_yaml('./config.yaml');
 
-global.API = {};
-
 require('./neuro.js');
+Neuro.init();
 
 Cfg.modules.forEach(name => Neuro.loadModule(name));
 Object.keys(Neuro.modules).forEach(name => {
