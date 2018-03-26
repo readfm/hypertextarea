@@ -1,5 +1,5 @@
 ---
-modules: [socket, data]
+modules: [functions, query, http, ws, data]
 default_app: pix8me
 developer_mode: true
 
@@ -23,3 +23,14 @@ electronSwitches:
   # 'allow-file-access-from-files'
   # 'allow-insecure-websocket-from-https-origin'
   - ['js-flags', '--harmony_collections']
+
+window:
+  openDevTools: true
+  BrowserWindow:
+    width: 1800
+    height: 900
+    useContentSize: true
+    title: NoToSpy
+    webPreferences:
+      plugins: true
+      blinkFeatures: 'OverlayScrollbars'

@@ -17,6 +17,8 @@ var mod = module.exports = global.WS = {
 
 	connected: function(ws){
 		var req = ws.upgradeReq;
+		//if(!req) return this.initConnection(ws);
+
 		var path = require('url').parse(req.url),
 			road = ws.road = decodeURI(path.pathname).replace(/^\/+|[^A-Za-z0-9_.:\/~ -]|\/+$/g, ''),
 			host = ws.host = req.headers.host,
@@ -39,7 +41,7 @@ var mod = module.exports = global.WS = {
 
 	createSession: function(sid){
 		var sid = sid || randomString(12);
-		var session = this.Sessions[sid] = {
+		var session = this.sessions[sid] = {
 			created: (new Date).getTime(),
 			sockets: [],
 			sid: sid
@@ -90,8 +92,10 @@ var mod = module.exports = global.WS = {
 				var fn = global.API[m.cmd];
 				if(fn){
 					var cb = function(r){
-						if(m.cb) RE[m.cb](r);
+						if(m.cb) ws.RE[m.cb](r);
 					};
+
+					console.log(cb);
 					var r = fn(m, ws, cb);
 				}
 			}
@@ -143,7 +147,8 @@ var mod = module.exports = global.WS = {
 			};
 
 			setTimeout(function(){
-				if(this.RE[m.cb]) delete this.RE[m.cb];
+				if(this.RE && this.RE[m.cb])
+					delete this.RE[m.cb];
 			}, 10 * 60 * 1000);
 		}
 	},
@@ -156,6 +161,9 @@ var mod = module.exports = global.WS = {
 
 	init: function(h){
 		var d = {};
+		if(Http.server)
+			d.server = Http.server;
+		else
 		if(!h)
 			d.port = Cfg.socket.port || this.default.port
 		else
@@ -166,7 +174,8 @@ var mod = module.exports = global.WS = {
 		var WebSocketServer = require('ws').Server,
 			wss = new WebSocketServer(d);
 
-		wss.on('connection', ws => {
+		wss.on('connection', (ws, req) => {
+			if(req) ws.upgradeReq = req;
 			this.connected(ws);
 		});
 	}

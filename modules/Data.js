@@ -3,8 +3,9 @@ const Path = require('path');
 const YAML = require('js-yaml');
 
 global.Data = {
+  cfg: Cfg.Data,
   items: {},
-  dir: Path.join(require('os').homedir(), 'Desktop', 'myItems'),
+  dir: Path.join(require('os').homedir(), 'Desktop', Cfg.Data.folder || 'myItems'),
   init: function(cfg){
     //this.init_ipfs();
     if(!FS.existsSync(this.dir))
@@ -154,6 +155,21 @@ global.Data = {
     return item
   },
 
+  getPath: function(id){
+    var path = Path.join(Data.dir, id);
+
+    if(FS.existsSync(path+'.json'))
+      return path+'.json';
+
+    if(FS.existsSync(path+'.yaml'))
+      return path+'.yaml';
+
+    if(FS.existsSync(path+'.log'))
+      return path+'.log';
+
+    return path;
+  },
+
   serve: function(port){
     require('http').createServer((req, res) => {
     	var Url = require('url').parse(req.url),
@@ -189,14 +205,32 @@ global.Data = {
 
 module.exports = Data;
 
-API.get = (m, q, re) => {
+Http.GET['items'] = function(q){
+  var cfg = {
+    path: Data.getPath(q.p[1])
+  };
+
+  query.pump(q, cfg);
+};
+
+API.test = (m, q, re) => {
+    re({
+      re: 'it works'
+    });
+};
+
+API.load = (m, q, re) => {
   Data.load(m.id).then(r => {
-    re(r);
+    re({
+      item: r
+    });
   });
 };
 
 API.save = (m, q, re) => {
   Data.save(m.item).then(r => {
-    re(r);
+    re({
+      item: r
+    });
   });
 };
