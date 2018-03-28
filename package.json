@@ -10,8 +10,9 @@
   "main": "main.js",
   "dependencies": {
     "clc": "^1.0.2",
+    "cookie": "^0.3.1",
     "electron-packager": "^11.0.0",
-    "js-yaml": "^3.10.0",
+    "js-yaml": "^3.11.0",
     "opn": "^5.2.0",
     "underscore": "^1.8.3",
     "ws": "^5.1.0"
