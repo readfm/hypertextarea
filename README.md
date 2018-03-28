@@ -1,36 +1,25 @@
-# hypertextarea
-smarter text
-* own memory
-* 1 line add in any browser you like
-* sync visuals, audios, meanings, socials
-* 3power faster cheaper feedback loops
+#owm
+own memory, experimental version #1
+this is an experiment!!
+apps in this experiment include
+/pix8 tag/sort pix for any string
+/ggif rich GIF w/ audio, links, etc
 
-## own memory 
-* possession is 9/10s of the law
-* write local memory
-* copy to opp (other people's platform)
+## own
+own memory close to you, less need for permission to write own memory
+process own memory how you like
+network own memory how you like
 
-## 1 line inject in any browser you like
-* chrome
-* brave
-* beaker
-* ssb
-
-## sync visuals audios meanings peoples
-* pix8 sort good pix for any string
-* vocatext sync vocals and text
-* twext meaning between the lines
-* ggif containerize
-
-## 3power faster cheaper feedback loops
-* smart contract, pay forward by crowd power
-* 0 risk if 4800 players don't agree in 24 hours
-* $1 low cost if 4800 players do agree in 24 hr
-* $0.01 economy of scale if 480000 mob agree now
+## memory
+1 terabyte 2018 = 0.2 mp4_years
+1 petabyte 2030 = 100 mp4_years
+1 exabyte  2042 = 100,000 mp4_years
+too much memory, not enough time
+process local memory faster
 
 ## install
-* make sure you have node.js and git installed
-* download it from https://nodejs.org/en/ https://git-scm.com/downloads
-* after you got it, run update.cmd
-* after it updates, run pix8.cmd
-* open http://gg.io.cx - to manage your local data within your browser 
+* node https://nodejs.org/en/
+* git https://git-scm.com/downloads
+* run update.cmd
+* run pix8.cmd
+* open http://gg.io.cx - to manage your local data within your browser
