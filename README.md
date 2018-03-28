@@ -29,9 +29,8 @@ smarter text
 * $0.01 economy of scale if 480000 mob agree now
 
 ## install
-make sure you have node.js and git installed
-https://nodejs.org/en/
-https://git-scm.com/downloads
-after you got it, run update.cmd
-after it updates, run pix8.cmd
-open http://gg.io.cx - to manage your local data within your browser 
+* make sure you have node.js and git installed
+* download it from https://nodejs.org/en/ https://git-scm.com/downloads
+* after you got it, run update.cmd
+* after it updates, run pix8.cmd
+* open http://gg.io.cx - to manage your local data within your browser 
