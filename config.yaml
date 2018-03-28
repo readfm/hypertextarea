@@ -1,5 +1,5 @@
 ---
-modules: [functions, query, http, ws, data]
+modules: [functions, query, http, ws, data, me]
 default_app: pix8me
 developer_mode: true
 
