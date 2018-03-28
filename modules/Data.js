@@ -65,11 +65,34 @@ global.Data = {
     }
   },
 
-  saveFile: function(buf){
-    console.log(buf);
+  update: function(id, set){
     return new Promise((resolve, reject) => {
-      var id = Data.generate_id(),
-          path = Path.join(this.dir, id);
+      try{
+        var itm = this.updateSync(id, set);
+      }
+      catch(err){
+        return reject(err);
+      }
+
+      resolve(itm);
+    });
+  },
+
+  updateSync: function(id, set){
+    if(typeof set == 'object'){
+      var item = Data.loadSync(id) || {id};
+      _.extend(item, set);
+      Data.saveSync(item);
+
+      return item;
+    }
+  },
+
+  saveFile: function(buf, id){
+    return new Promise((resolve, reject) => {
+      if(!id) id = Data.generate_id();
+
+      var path = Path.join(this.dir, id);
 
       try{
         FS.writeFileSync(path, Buffer.from(buf));
@@ -83,11 +106,24 @@ global.Data = {
     });
   },
 
-  append: function(id, line){
-    var path = Path.join(this.dir, id+'.log');
-    FS.appendFileSync(path, "\n"+line);
-  },
+  upd: 4,
+  log: function(line, id){
+    if(!id) id = Data.generate_id();
 
+    var path = Path.join(this.dir, id+'.log');
+
+    if(!FS.existsSync(path))
+      FS.writeFileSync(path, line);
+    else
+      FS.appendFileSync(path, "\r\n"+line);
+
+    if(Data.items[id])
+      Data.items[id].push(line);
+    else
+      Data.items[id] = [line];
+
+    return id;
+  },
 
   load: function(id){
     return new Promise((resolve, reject) => {
@@ -147,8 +183,9 @@ global.Data = {
     }
     else
     if(FS.existsSync(path+'.log')){
-      var content = FS.readFileSync(path+'.log');
-      var item = content.split("\n");
+      var content = String(FS.readFileSync(path+'.log'));
+
+      var item = content.split(/\r?\n/);
     }
     else return;
 
@@ -219,12 +256,22 @@ API.test = (m, q, re) => {
     });
 };
 
+API.log = (m, q, re) => {
+  var id = Data.log(m.line, m.id);
+  if(m.cb) re({id});
+};
+
 API.load = (m, q, re) => {
   Data.load(m.id).then(r => {
     re({
       item: r
     });
   });
+};
+
+API.update = (m, q, re) => {
+  var item = Data.updateSync(m.id, m.set);
+  if(m.cb) re({item});
 };
 
 API.save = (m, q, re) => {
@@ -234,3 +281,77 @@ API.save = (m, q, re) => {
     });
   });
 };
+
+/*
+API.createStream = function(m, ws, re){
+  var id = Data.generate_id(),
+      path = Path.join(this.dir, id),
+  		stream = fs.createWriteStream(path, {flags: 'w'});
+
+	ws.stream = stream;
+
+	re({id});
+}
+
+S['createStream'] = function(m, ws){
+	var tmpName = randomString(20),
+		tmpPath = query.tmp + tmpName,
+		tmpStream = fs.createWriteStream(tmpPath, {flags: 'w'});
+
+	ws.stream = tmpStream;
+
+	if(m.cb)
+		RE[m.cb]({name: tmpName});
+}
+
+
+API.saveStream = function(m, ws, re){
+	if(!ws.stream) return ws.json({error: 'no stream'});
+
+	ws.stream.end();
+	var tmpName = ws.stream.path.split('/').pop();
+
+	var user = ws.session.user;
+
+	if(m.id){
+			var file = data[0];
+			if(file.owner && (!user || user.id != file.owner))
+				return ws.json({error: 'access denied'});
+
+			var set = {
+				updated: (new Date()).getTime(),
+				size: ws.stream.bytesWritten
+			};
+
+			_.extend(file, set);
+
+			fs.renameSync(ws.stream.path, file.path || (query.pathFiles + file.id));
+			C[cfg.fs.collection].update({id: file.id}, {$set : set}, function(){
+				if(m.cb) RE[m.cb]({file: file, name: tmpName});
+			});
+	}
+
+	var file = {
+		id: Data.generate_id(),
+		size: ws.stream.bytesWritten,
+		time: (new Date()).getTime(),
+    owner: Me.id
+	};
+
+	if(typeof m.name == 'string')
+		file.name = m.name;
+
+	if(typeof m.mime == 'string')
+		file.mime = m.mime;
+
+  Data.save(file);
+  Data.saveFile(ws.stream);
+
+	C[cfg.fs.collection].insert(file, {safe: true}, function(e, r){
+		fs.renameSync(ws.stream.path, query.pathFiles + file.id);
+		delete ws.stream;
+
+		if(m.cb) re({file: r.ops[0], name: tmpName});
+	});
+}
+*/

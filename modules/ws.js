@@ -66,7 +66,7 @@ var mod = module.exports = global.WS = {
 
 		ws.session.sockets.push(ws);
 
-		ws.json(_.extend(_.pick(ws.session, 'sid', 'user'), {cmd: 'session'}));
+		ws.json(_.extend(_.pick(ws.session, 'sid', 'user'), {cmd: 'session', my_id: Me.id}));
 
 		ws.on('message', this.onMessage);
 		ws.on('close', this.onClose);
@@ -143,7 +143,7 @@ var mod = module.exports = global.WS = {
 				_.extend(r, msg);
 				ws.json(r);
 
-				delete this.RE[m.cb];
+				delete ws.RE[m.cb];
 			};
 
 			setTimeout(function(){
