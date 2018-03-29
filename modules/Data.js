@@ -5,11 +5,15 @@ const YAML = require('js-yaml');
 global.Data = {
   cfg: Cfg.Data,
   items: {},
+  tmp: Path.join(Neuro.path, 'tmp'),
   dir: Path.join(require('os').homedir(), 'Desktop', Cfg.Data.folder || 'myItems'),
   init: function(cfg){
     //this.init_ipfs();
     if(!FS.existsSync(this.dir))
       FS.mkdirSync(this.dir);
+
+    if(!FS.existsSync(this.tmp))
+      FS.mkdirSync(this.tmp);
 
     this.serve(Cfg.Data.port);
 
@@ -195,6 +199,9 @@ global.Data = {
   getPath: function(id){
     var path = Path.join(Data.dir, id);
 
+    if(FS.existsSync(path))
+      return path;
+
     if(FS.existsSync(path+'.json'))
       return path+'.json';
 
@@ -282,7 +289,7 @@ API.save = (m, q, re) => {
   });
 };
 
-/*
+
 API.createStream = function(m, ws, re){
   var id = Data.generate_id(),
       path = Path.join(this.dir, id),
@@ -293,19 +300,19 @@ API.createStream = function(m, ws, re){
 	re({id});
 }
 
-S['createStream'] = function(m, ws){
+API.createStream = function(m, ws, re){
 	var tmpName = randomString(20),
-		tmpPath = query.tmp + tmpName,
-		tmpStream = fs.createWriteStream(tmpPath, {flags: 'w'});
+		tmpPath = Data.tmp + '/' + tmpName,
+		tmpStream = FS.createWriteStream(tmpPath, {flags: 'w'});
 
 	ws.stream = tmpStream;
 
-	if(m.cb)
-		RE[m.cb]({name: tmpName});
+	if(m.cb) re({name: tmpName});
 }
 
 
 API.saveStream = function(m, ws, re){
+  console.log(ws);
 	if(!ws.stream) return ws.json({error: 'no stream'});
 
 	ws.stream.end();
@@ -314,21 +321,21 @@ API.saveStream = function(m, ws, re){
 	var user = ws.session.user;
 
 	if(m.id){
-			var file = data[0];
-			if(file.owner && (!user || user.id != file.owner))
-				return ws.json({error: 'access denied'});
+		var file = Data.loadSync(m.id);
+		if(file.owner && (!Me || Me.id != file.owner))
+			return ws.json({error: 'access denied'});
 
-			var set = {
-				updated: (new Date()).getTime(),
-				size: ws.stream.bytesWritten
-			};
+		var set = {
+			updated: (new Date()).getTime(),
+			size: ws.stream.bytesWritten
+		};
 
-			_.extend(file, set);
+		_.extend(file, set);
 
-			fs.renameSync(ws.stream.path, file.path || (query.pathFiles + file.id));
-			C[cfg.fs.collection].update({id: file.id}, {$set : set}, function(){
-				if(m.cb) RE[m.cb]({file: file, name: tmpName});
-			});
+		FS.renameSync(ws.stream.path, file.path || Path.join(Data.dir, file.id));
+    Data.save(file).then(item => {
+			if(m.cb) re({file: item, name: tmpName});
+		});
 	}
 
 	var file = {
@@ -344,14 +351,10 @@ API.saveStream = function(m, ws, re){
 	if(typeof m.mime == 'string')
 		file.mime = m.mime;
 
-  Data.save(file);
-  Data.saveFile(ws.stream);
-
-	C[cfg.fs.collection].insert(file, {safe: true}, function(e, r){
-		fs.renameSync(ws.stream.path, query.pathFiles + file.id);
+  Data.save(file).then(item => {
+		FS.renameSync(ws.stream.path, file.path || Path.join(Data.dir, file.id));
 		delete ws.stream;
 
-		if(m.cb) re({file: r.ops[0], name: tmpName});
+		if(m.cb) re({file: item, name: tmpName});
 	});
 }
-*/
