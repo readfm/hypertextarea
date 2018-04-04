@@ -40,6 +40,23 @@ global.Data = {
     });
   },
 
+  download: function(url, id){
+    if(!id) id = this.generate_id();
+    const path = Path.join(this.dir, id);
+
+    var file = fs.createWriteStream(path);
+
+    return new Promise((resolve, reject) => {
+      if(url.indexOf('http') === 0)
+        require(url.indexOf('https') === 0?'https':'http').get(url, r => {
+          r.pipe(file);
+          r.on('end', () => {
+            resolve(id);
+          });
+        });
+      else reject();
+  },
+
   storeAsType: 'yaml',
   saveSync: function(item){
     if(typeof item == 'object'){
@@ -116,17 +133,19 @@ global.Data = {
 
     var path = Path.join(this.dir, id+'.log');
 
-    if(!FS.existsSync(path))
-      FS.writeFileSync(path, line);
-    else
-      FS.appendFileSync(path, "\r\n"+line);
+    return new Promise((resolve, reject) => {
+      if(!FS.existsSync(path))
+        FS.writeFileSync(path, line);
+      else
+        FS.appendFileSync(path, "\r\n"+line);
 
-    if(Data.items[id])
-      Data.items[id].push(line);
-    else
-      Data.items[id] = [line];
+      if(Data.items[id])
+        Data.items[id].push(line);
+      else
+        Data.items[id] = [line];
 
-    return id;
+      resolve(id);
+    });
   },
 
   load: function(id){
@@ -264,8 +283,9 @@ API.test = (m, q, re) => {
 };
 
 API.log = (m, q, re) => {
-  var id = Data.log(m.line, m.id);
-  if(m.cb) re({id});
+  Data.log(m.line, m.id).then(id => {
+    if(m.cb) re({id});
+  });
 };
 
 API.load = (m, q, re) => {
@@ -282,10 +302,19 @@ API.update = (m, q, re) => {
 };
 
 API.save = (m, q, re) => {
-  Data.save(m.item).then(r => {
-    re({
-      item: r
+  if(m.url){
+    var id = Data.generate_id();
+    if(m.item) m.item.id = id;
+    Data.download(m.url, id).then(id => {
+      re({id});
     });
+  }
+  
+  Data.save(m.item).then(r => {
+    if(!m.url)
+      re({
+        item: r
+      });
   });
 };
 
