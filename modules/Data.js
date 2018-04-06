@@ -44,7 +44,7 @@ global.Data = {
     if(!id) id = this.generate_id();
     const path = Path.join(this.dir, id);
 
-    var file = fs.createWriteStream(path);
+    var file = FS.createWriteStream(path);
 
     return new Promise((resolve, reject) => {
       if(url.indexOf('http') === 0)
@@ -55,6 +55,7 @@ global.Data = {
           });
         });
       else reject();
+    });
   },
 
   storeAsType: 'yaml',
@@ -309,7 +310,7 @@ API.save = (m, q, re) => {
       re({id});
     });
   }
-  
+
   Data.save(m.item).then(r => {
     if(!m.url)
       re({
