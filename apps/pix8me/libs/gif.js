@@ -38,7 +38,6 @@ $.extend(Gif.prototype, {
 	image: function(src, cb){
 		var t = this;
 
-		console.log(src);
 		var xhr = new XMLHttpRequest();
 		xhr.open("GET", src, true);
 		xhr.responseType = "arraybuffer";

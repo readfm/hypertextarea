@@ -1,5 +1,11 @@
 var Carousel = function(opt){
+	var carousel = this;
+
 	this.cfg = $.extend(this.cfg, {
+		name: 'images',
+		onAdd: function(url, $thumb){
+			carousel.include(url, $thumb);
+		},
 		allowPatterns: false,
 		down2remove: 0.5,
 		takeOffLimit: 5,
@@ -8,14 +14,13 @@ var Carousel = function(opt){
 		preloadLocal: true,
 		preloadGoogle: true,
 		fetchLimit: 8,
-	}, opt);
+	}, Cfg.carousel, opt);
 
 	var name = this.cfg.name;
 	var $carousel = this.$t = $("<div>", {class: 'carousel bar'});
 	this.$t.attr('name', name);
 	this.name = name;
 
-	var carousel = this;
 
 	this.$tag = $('<input>', {class: 'carousel-tag'}).appendTo($carousel);
 	this.$tag.bindEnter(function(ev){
@@ -75,14 +80,21 @@ Carousel.prototype = {
 			var tgName = tg[0];
 
 			this.owner = u;
+
+			var id = Pix8.words[tgName];
+			if(!id) return;
+
 			if(!u.length)
 				this.loadPublic(tgName);
 			else
-				this.loadView(tgName);
+				this.loadView(id);
 		}
 		else{
-			this.owner = null;
-			this.loadView(tag);
+			this.owner = User.id;
+
+			var id = Pix8.words[tag];
+			if(!id) return;
+			this.loadView(id);
 		}
 	},
 
@@ -128,19 +140,19 @@ Carousel.prototype = {
 		add = true;
 
 		var save = function(){
-			Data.save(item);
+			Data.save(item).then(item => {
+				var $item = pix.build(item);
 
-			var $item = pix.build(item);
+				if($thumbOn && $thumbOn.length)
+					$item.insertBefore($thumbOn);
+				else
+					carousel.$t.append($item);
 
-			if($thumbOn && $thumbOn.length)
-				$item.insertBefore($thumbOn);
-			else
-				carousel.$t.append($item);
+				carousel.resize($item);
+				carousel.supportEvents($item);
 
-			carousel.resize($item);
-			carousel.supportEvents($item);
-
-			carousel.updateView();
+				carousel.updateView();
+			});
 		};
 
 		var skipCheck = [
@@ -174,7 +186,13 @@ Carousel.prototype = {
 
 				console.log(item);
 
-				save();
+
+				Data.download(url).then(id => {
+					item.file = id;
+					console.log(id);
+					console.log(item);
+					save();
+				});
 			}, 500);
 
 			img.onerror = function(){
@@ -350,7 +368,7 @@ Carousel.prototype = {
 
 		var okDrag = (
 			!$thumb.hasClass('item-user') &&
-			this.getOwner() == User.name
+			true //this.getOwner() == User.name
 		);
 
 		console.log(okDrag);
@@ -359,6 +377,9 @@ Carousel.prototype = {
 			console.log(dd);
 		}, {click:true}).drag("start", function(ev, dd){
 			var o = $(this).offset();
+
+			console.log(o);
+
 			$(this).data('_pos', o.left+'x'+o.top);
 			dd.startParent = this.parentNode;
 
@@ -401,7 +422,8 @@ Carousel.prototype = {
 			var $proxy = $(dd.proxy);
 
 			var dy = Math.abs(dd.deltaY),
-				dx = Math.abs(dd.deltaX);
+					dx = Math.abs(dd.deltaX);
+
 
 			if(dy > Cfg.drag.dy && (/*dd.lengthC > 1 || */dx > Cfg.drag.dx) && !pix.slide){
 				$proxy.addClass('drag').show();
@@ -793,6 +815,8 @@ Carousel.prototype = {
 	// what goes after @ in tag
 	getOwner: function(){
 		if(this.owner) return this.owner;
+		return User.id;
+		return;
 
 		var path = (
 			((this.$tag && !this.$tag.attr('disabled'))?this.$tag.val():'') ||
@@ -815,7 +839,8 @@ Carousel.prototype = {
 		var carousel = this;
 		if(!view) view = {
 			items: this.getIds(),
-			type: 'view'
+			type: 'view',
+			tag: this.$tag.val()
 		};
 
 		view.path = carousel.getPath();
@@ -823,13 +848,16 @@ Carousel.prototype = {
 		if(view.path.indexOf('http') == 0)
 			view.title = carousel.getTitle();
 
-		view.gid = User.id;
+		//view.gid = User.id;
 		view.owner = this.getOwner();
 
+		console.log(view);
 		if(!view.items || !view.items.length) return;
 
 		Data.save(view).then(view => {
+			console.log(view);
 			carousel.view = view;
+			Pix8.linkView(view);
 		});
 
 		return view;
@@ -849,7 +877,11 @@ Carousel.prototype = {
 			items: carousel.getIds()
 		};
 
-		Data.save($.extend(this.view, set));
+		var view = $.extend(this.view, set);
+
+		console.log(view);
+
+		Data.save(view);
 	},
 
 	updatePublic: function(){
@@ -880,7 +912,7 @@ Carousel.prototype = {
 		function(r){
 			var ids = [];
 			(r.items || []).forEach(function(item){
-				Pix.items[item.id] = item;
+				Data.items[item.id] = item;
 				ids.push(item.id);
 			});
 
@@ -895,13 +927,11 @@ Carousel.prototype = {
 
 		carousel.$t.children('.thumb').remove();
 
-		var id = 'view_'+id;
 		console.log('Load view: ', id);
 		Data.load(id).then(item => {
-			console.log(item);
-			item = item || {id: id}
+			if(!item) return;
 			carousel.setView(item);
-		});
+		}, fail => {});
 	},
 
 	//load sequence of public items and put them into carousel
@@ -979,7 +1009,7 @@ Carousel.prototype = {
 
 			Pix.preload(view.items).then(function(){
 				view.items.slice(0, carousel.cfg.fetchLimit).forEach(function(id){
-					var item = Pix.items[id],
+					var item = Data.items[id],
 							$item = Pix.build(item);
 
 					carousel.$t.prepend($item);
@@ -1031,7 +1061,7 @@ Carousel.prototype = {
 			carousel.view = false;
 			carousel.$t.children('.thumb').remove();
 			(r.items || []).forEach(function(item){
-				Pix.items[item.id] = item;
+				Data.items[item.id] = item;
 				ids.push(item.id);
 			});
 
@@ -1087,7 +1117,7 @@ Carousel.prototype = {
 						carousel.loading--;
 
 						if(r.item){
-							Pix.items[r.item.id] = r.item;
+							Data.items[r.item.id] = r.item;
 							var $thumb = carousel.push(r.item.id);
 						}
 
@@ -1174,7 +1204,7 @@ Carousel.prototype = {
 		var $item;
 
 		console.log(id);
-		var item = pix.items[id];
+		var item = Data.items[id];
 		if(!item) return;
 
 		$item = pix.build(item);
@@ -1409,7 +1439,7 @@ Carousel.prototype = {
 							width: img.naturalWidth,
 							height: img.naturalHeight,
 							path: carousel.getPath(),
-							//tag: carousel.$tag.val(),
+							tag: carousel.$tag.val(),
 							href: document.location.href,
 							gid: User.id,
 							type: 'image'
@@ -1421,7 +1451,7 @@ Carousel.prototype = {
 							collection: Cfg.collection
 						}, function(r){
 							if(r.item){
-								Pix.items[r.item.id] = r.item;
+								Data.items[r.item.id] = r.item;
 								$item.removeClass('uploading');
 								$item.data(r.item);
 								$item.attr({
@@ -1490,21 +1520,23 @@ Carousel.prototype = {
 
 				carousel.resize($item);
 
+				console.log(item);
 				var reader = new FileReader();
 				reader.onload = function(ev2){
-					Data.saveFile(ev2.target.result).then(id => {
-						console.log(id);
-						if(!id) return $item.remove();
+					console.log(ev2.target.result);
+					Data.saveFile(ev2.target.result).then(file => {
+						if(!file || !file.id) return $item.remove();
+						var id = file.id;
 
 						var img = $item.children('img')[0];
 
 						var item = {
-							src: Cfg.Data.host+':'+Cfg.Data.port + '/' + id,
+							src: Cfg.files + id,
 							file: id,
 							width: img.naturalWidth,
 							height: img.naturalHeight,
 							path: carousel.getPath(),
-							//tag: carousel.$tag.val(),
+							tag: carousel.$tag.val(),
 							type: 'image'
 						};
 
@@ -1559,7 +1591,7 @@ Carousel.prototype = {
 					width: img.naturalWidth,
 					height: img.naturalHeight,
 					path: carousel.getPath(),
-					//tag: carousel.$tag.val(),
+					tag: carousel.$tag.val(),
 					href: document.location.href,
 					gid: User.id,
 					type: 'image'
@@ -1571,7 +1603,7 @@ Carousel.prototype = {
 					collection: Cfg.collection
 				}, function(r){
 					if(r.item){
-						Pix.items[r.item.id] = r.item;
+						Data.items[r.item.id] = r.item;
 						$item.removeClass('uploading');
 						$item.data(r.item);
 						$item.attr({

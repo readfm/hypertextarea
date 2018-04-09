@@ -213,28 +213,6 @@ window.tip = {
 	}
 };
 
-
-
-$.fn.hideIf = function(so){
-	return this.each(function(){
-		if(so)
-			$(this).hide();
-	});
-}
-
-$.fn.showIf = function(so){
-	return this.each(function(){
-		$(this)[so?'show':'hide']();
-	});
-}
-
-$.fn.classIf = function(cl, so){
-	return this.each(function(){
-		$(this)[so?'addClass':'removeClass'](cl);
-	});
-}
-
-
 Image.prototype.generateThumb = function(w, h, cb){
   var image = this;
   var ctx = document.createElement('canvas').getContext('2d');
@@ -547,6 +525,39 @@ $.fn.date = function(time){
 
 	return $t;
 }
+
+
+$.fn.bindEnter = function(fn){
+    var el = this;
+    this.bind('keypress', function(e){
+        if(e.keyCode==13){
+            if(fn) fn.call(this);
+            else $(this).blur();
+        }
+    });
+    return this;
+};
+
+
+$.fn.hideIf = function(so){
+  return this.each(function(){
+    if(so)
+      $(this).hide();
+  });
+}
+
+$.fn.showIf = function(so){
+  return this.each(function(){
+    $(this)[so?'show':'hide']();
+  });
+}
+
+$.fn.classIf = function(cl, so){
+  return this.each(function(){
+    $(this)[so?'addClass':'removeClass'](cl);
+  });
+}
+
 
 
 CanvasRenderingContext2D.prototype.wrapText = function (text, x, y, maxWidth, lineHeight, df) {

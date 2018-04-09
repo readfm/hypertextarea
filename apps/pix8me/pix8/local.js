@@ -13,6 +13,10 @@ window.WSL = function(server, cb){
 	this.connection.onclose = function(){
 		//$('.stream-download').hide();
 		Local.files = [];
+		Pic.sendAll({
+			cmd: 'files',
+			files: []
+		});
 	};
 	
 	this.connection.onerror = function(error){
@@ -64,11 +68,21 @@ window.Local = {
 
 		'local.add': function(m){
 			Local.files.push(m.file);
+			
+			Pic.sendAll({
+				cmd: 'files',
+				files: Local.files
+			});
 		},
 
 		'local.remove': function(m){
 			var index = Local.files.indexOf(m.file);
 			Local.files.splice(index, 1);
+
+			Pic.sendAll({
+				cmd: 'files',
+				files: Local.files
+			});
 		},
 
 		alert: function(msg){
@@ -118,8 +132,8 @@ Local.api = Local.ip+'/local/',
 (function(){
 	if(!Cfg.local) return;
 	Local.connect();
+
 	setInterval(function(){
-		if(!Local.isReady())
-			Local.connect();
+		//if(!Local.isReady()) Local.connect();
 	}, Local.timeout);
 })();

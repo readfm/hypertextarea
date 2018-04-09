@@ -88,8 +88,10 @@ $(document).ready(function(){
 
 	$('.x').click(ui.closeModals);
 
-	Site.connect();
-
+	//Site.connect();
+	Site.ready.forEach(function(f){
+		f();
+	});
 
 	$('#auth-open').click(function(){
 		window.open('http://auth.taitis.com/#'+Cookies.get('sid'), '_blank', {

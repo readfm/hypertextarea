@@ -9,6 +9,8 @@ require('./misc.js');
 
 global.Cfg = require_yaml('./config.yaml');
 
+global.Sessions = {};
+
 require('./neuro.js');
 Neuro.init();
 

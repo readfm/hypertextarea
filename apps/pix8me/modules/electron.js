@@ -6,54 +6,6 @@ $("<link>", {
 
 
 $(ev => {
-  var $pic = Pix.$pic = $("<div>", {id: 'pic', class: 'bar'}).prependTo('body');
-
-  var $header = $("<div>", {id: 'pix8-header'}).prependTo($pic);
-  $("<button>", {id: 'pic8-openMenu'}).html("&#8803").appendTo($header);
-  $("<div>", {id: 'pic8-title'}).appendTo($header);
-
-
-  $("<button>", {id: 'pic8-close'}).click(ev => {
-    window.close();
-  }).html('&#10005;').appendTo($header);
-
-
-    /*
-    $("<button>", {id: 'pic8-maximize'}).click(ev => {
-      if(!window.isMaximized())
-        window.maximize();
-      else
-        window.unmaximize();
-    }).html('&#9744;').appendTo($header);
-    */
-    
-  var window = require('electron').remote.getCurrentWindow();
-  $("<button>", {id: 'pic8-minimize'}).click(ev => {
-    window.minimize();
-  }).html('&minus;').appendTo($header);
-
-
-  var $resize = $("<div id='pic-resize'></div>");
-	$resize.appendTo($pic)
-
-  Pix.carousel('pix8test2');
-  Site.resize();
-
-  var $tag = Pix.$tag = $("<input id='pic-tag'/>").appendTo($resize);
-  $tag.bindEnter(function(){
-    Pix.carousel(this.value);
-    this.value = '';
-  }).click(function(){
-    $tag.focus();
-  });
-
-
-  $(window).resize(function(event){
-    var $lastCarousel = $('#pic > .carousel').last();
-    $lastCarousel.height($lastCarousel.height() + document.body.clientHeight - $('#pic').height());
-    $lastCarousel[0].carousel.resize();
-  });
-
   document.addEventListener("keydown", e => {
     if (e.which === 123)
       require('remote').getCurrentWindow().toggleDevTools();
@@ -70,4 +22,21 @@ $(ev => {
 
 $(ev => {
   Context.init();
+  User.id = Remote.getGlobal('Me').id;
+
+  Data.load(User.id).then(item => {
+    User.item = item || {id: User.id};
+
+    Pix8.init();
+
+
+    $(window).resize(function(event){
+      var $lastCarousel = $('#pic > .carousel').last();
+      if(!$lastCarousel.length) return;
+      $lastCarousel.height($lastCarousel.height() + document.body.clientHeight - $('#pic').height());
+      $lastCarousel[0].carousel.resize();
+    });
+  });
+
+  //$(document).trigger('connected');
 });

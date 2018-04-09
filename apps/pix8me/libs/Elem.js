@@ -70,8 +70,10 @@ $.extend(module.prototype, {
 			if(file){
 				$item.addClass('file');
 
+				/*
 				if(item.src && item.src.indexOf('127.0.0.1')<0)
 					$item.css({'background-image': "url("+Cfg.thumber+item.src.replace('://', '/')+")"});
+				*/
 
 				t.loadFile(file);
 			}
@@ -93,7 +95,8 @@ $.extend(module.prototype, {
 			$item.attr('title', item.link);
 		}
 
-		Context.for(t.$item);
+		if(window.Context)
+			Context.for(t.$item);
 
 		/*
 		if(item.width && item.height){
@@ -259,8 +262,8 @@ $.extend(module.prototype, {
 				if(typeof carousel == 'object')
 					carousel.resize(t.$item);
 
-
-				Context.for(t.$item);
+				if(window.Context)
+					Context.for(t.$item);
 
 				gif.fade = true;
 				$(gif.canvas).click(function(){
@@ -269,7 +272,8 @@ $.extend(module.prototype, {
 				});
 			});
 
-			Context.for(t.$item);
+			if(window.Context)
+				Context.for(t.$item);
 
 			t.$item.append(image);
 		};

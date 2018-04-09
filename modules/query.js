@@ -32,7 +32,7 @@ var Query = function(req, res){
 
 	if(this.cookie && this.cookie.sid){
 		this.sid = this.cookie.sid;
-		var ses = acc.sessions[this.cookie.sid];
+		var ses = Sessions[this.cookie.sid];
 		if(ses){
 			this.session = ses;
 			this.user = ses.user;
@@ -268,15 +268,17 @@ global.query = {
 		try{
 			var stat = fs.lstatSync(path);
 			if(stat.isDirectory()){
-				path += 'index.html';
+				path += cfgu.index || 'index.html';
 				stat = fs.lstatSync(path);
 			}
+
 		} catch(e){
 			//console.log(path.red);
 			q.res.writeHead(404);
 			q.res.end();
 			return;
 		}
+
 
 		var lm = stat.mtime.toUTCString();
 		var renew = !(q.req.headers['if-modified-since'] && q.req.headers['if-modified-since'] == lm);

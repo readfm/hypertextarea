@@ -2,17 +2,16 @@
     left: 16px;
 }
 
-#pix8list-toggle, #pix8list-infinite, #pix8list-mute{
+#pix8list-toggle, #pix8list-infinite, #pix8list-mute, #pix8-openLinks{
     position: absolute;
     cursor: pointer;
     top: 0;
-    left: 0;
-    width: 30px;
-    height: 30px;
-    margin: 0;
+    left: 20px;
+    width: 21px;
+    height: 20px;
     text-align: center;
     color: white;
-    background: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.4);
     padding: 2px 4px;
     font-size: 13px;
     border-radius: 3px;
@@ -28,16 +27,19 @@
     display: none;
 }
 
+#pix8-openLinks{
+    left: 40px;
+}
+
 #pix8-title{
-    height: 30px;
+    height: 20px;
     margin: 0;
     background-color: rgba(0, 0, 0, 0.4);
     color: #cccccc;
-    margin-left: 31px;
-    padding: 2px 8px;
+    margin-left: 63px;
+    padding: 2px;
     border: 0;
-    border-radius: 0;
-    width: 100%;
+    width: calc(100% - 65px);
 }
 
 #pix8list{
@@ -52,7 +54,7 @@
 }
 
 #pix8list-filters{
-    margin-left: 40px;
+    margin-left: 60px;
     color: white;
 }
 
@@ -68,7 +70,7 @@
 }
 
 #pix8list-items{
-    height: calc(100% - 20px);
+    height: calc(100% - 24px);
     overflow-y: auto;
     overflow-x: hidden;
 }

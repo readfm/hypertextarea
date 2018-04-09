@@ -1,3 +1,5 @@
+const Path = require('path');
+
 var mod = module.exports = global.Http = {
   init: function(){
     mod.server = require('http').createServer(query.serv);
@@ -16,4 +18,16 @@ var mod = module.exports = global.Http = {
   GET: {},
   POST: {},
   PUT: {}
+};
+
+
+
+Http.GET['apps'] = function(q){
+  const path = q.p[2]?q.p.slice(2).join('/'):'browse.html',
+        file = Path.join(Neuro.path, 'apps', q.p[1], path);
+
+  console.log(path);
+  console.log(file);
+
+  query.pump(q, file);
 };

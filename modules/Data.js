@@ -112,19 +112,34 @@ global.Data = {
 
   saveFile: function(buf, id){
     return new Promise((resolve, reject) => {
-      if(!id) id = Data.generate_id();
+    	var file = {
+    		id: Data.generate_id(),
+    		time: (new Date()).getTime(),
+        owner: Me.id
+    	};
 
-      var path = Path.join(this.dir, id);
+      /*
+    	if(typeof m.name == 'string')
+    		file.name = m.name;
 
-      try{
-        FS.writeFileSync(path, Buffer.from(buf));
-      }
-      catch(err){
-        console.error(err);
-        return reject(err);
-      }
+    	if(typeof m.mime == 'string')
+    		file.mime = m.mime;
+      */
 
-      resolve(id);
+      console.log(buf);
+      Data.save(file).then(item => {
+        var path = Path.join(this.dir, file.id);
+
+        try{
+          FS.writeFileSync(path, buf);
+        }
+        catch(err){
+          console.error(err);
+          return reject(err);
+        }
+
+        resolve(file);
+      });
     });
   },
 

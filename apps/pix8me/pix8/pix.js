@@ -40,13 +40,11 @@ var pix = Pix = {
 	$items: {},
 
 	// items already loaded from database
-	items: Data.items || {},//window.Data?Data.items:{},
 
 	carousel: function(tag){
 		var carousel = new Carousel({
 			name: 'images',
 			onAdd: function(url, $thumb){
-				console.log(url);
 				carousel.include(url, $thumb);
 			},
 			preloadLocal: false,
@@ -55,8 +53,6 @@ var pix = Pix = {
 
 		carousel.$t.appendTo(Pix.$pic);
 		carousel.onTag(tag);
-
-		window.resizeBy(0, carousel.$t.height())
 
 		return carousel;
 	},
@@ -164,7 +160,7 @@ var pix = Pix = {
 	preload: function(ids){
 		var newIds = [];
 		ids.forEach(function(id){
-			if(!Pix.items[id])
+			if(!Data.items[id])
 				newIds.push(id);
 		});
 
@@ -178,7 +174,7 @@ var pix = Pix = {
 					collection: Cfg.collection
 				}, function(r){
 					(r.items || []).forEach(function(item){
-						Pix.items[item.id] = item;
+						Data.items[item.id] = item;
 					});
 
 					resolve();
@@ -315,7 +311,7 @@ var pix = Pix = {
 
 	unusedIds: function(){
 		var ids = [];
-		for(var id in pix.items){
+		for(var id in Data.items){
 			if(!$('#carousels span[name=item'+id+']').length){
 		    	ids.push(parseInt(id));
 			}

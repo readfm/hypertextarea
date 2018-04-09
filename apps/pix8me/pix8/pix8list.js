@@ -11,7 +11,7 @@ window.Pix8list = {
     $('<div>', {id: 'pix8list-filters'}).appendTo($cont);
     $('<div>', {id: 'pix8list-items'}).appendTo($cont);
 
-    $('<button>', {id: 'pix8list-toggle'}).text('=').prependTo('#pic').click(function(){
+    $('<span>', {id: 'pix8list-toggle'}).text('=').prependTo('#pic').click(function(){
       if($(this).hasClass('active')){
         $cont.hide();
         $(this).removeClass('active')
@@ -33,7 +33,6 @@ window.Pix8list = {
       $('#pix8list-filters').children().first().click();
     });
 
-    /*
     $('<span>', {id: 'pix8list-infinite'}).text('∞').prependTo('#pic').click(function(){
       if($(this).hasClass('active')){
         $cont.hide();
@@ -51,7 +50,6 @@ window.Pix8list = {
 
       $('#pix8list-filters').children().first().click();
     });
-    */
 
     $('<span>', {id: 'pix8list-mute'}).html('&#9835;').prependTo('#pic').click(function(){
       if(window.Tx && Tx.youtube) Tx.youtube.pauseVideo();

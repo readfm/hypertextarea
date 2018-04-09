@@ -18,7 +18,7 @@ global.Neuro = {
       windows: {}
     };
 
-    app.conf = require_yaml(Path.join(app.dir, 'config.yaml'));
+    var cfg = app.conf = require_yaml(Path.join(app.dir, 'config.yaml'));
 
     if(Neuro.express && app.conf.httpAccess)
       Neuro.express.use('/'+name, require('express').static(app.dir));
