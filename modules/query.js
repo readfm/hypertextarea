@@ -306,6 +306,8 @@ global.query = {
 		if(query.mime[ext])
 			headers["Content-Type"] = query.mime[ext];
 
+		console.log(path);
+
 		q.res.writeHead(renew?200:304,headers);
 		if(renew){
 			var readStream = fs.createReadStream(path);

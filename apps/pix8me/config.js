@@ -3,6 +3,11 @@ window.Cfg = {
   host: '127.0.0.1',
   files: 'http://127.0.0.1:5030/items/',
 
+  central: {
+    server: 'io.cx'
+  },
+
+  sidCookie: "pix8sid",
 
 	name: 'pix8',
 

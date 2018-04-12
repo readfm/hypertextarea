@@ -26,7 +26,7 @@ window.Pix8 = {
       var carousel = Pix.carousel(this.value);
       this.value = '';
 
-      if(window.isElectron)
+      if(false && window.isElectron)
         window.resizeBy(0, carousel.$t.height())
     }).click(function(){
       $tag.focus();
@@ -143,7 +143,6 @@ window.Pix8 = {
 
   buildTag: function(id, text){
     var $item = $('<a>');
-    console.log(text);
     $item.text(text).data({id, text});
     $item.click(Pix8.clickTag);
     return $item;
