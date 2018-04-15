@@ -100,7 +100,8 @@ window.Data = {
         if(r.item){
           if(r.item.length && typeof id == 'object' && id.length)
             r.item.forEach(item => {
-              Data.items[item.id] = item;
+              if(item)
+                Data.items[item.id] = item;
             });
           else
             Data.items[id] = r.item;
