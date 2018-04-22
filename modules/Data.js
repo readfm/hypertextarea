@@ -209,7 +209,7 @@ global.Data = {
   },
 
   read: function(id){
-    var path = Path.join(this.dir, id);
+    var path = Path.join(this.dir, ''+id);
 
     if(FS.existsSync(path+'.json')){
       var content = FS.readFileSync(path+'.json');
@@ -232,7 +232,7 @@ global.Data = {
   },
 
   getPath: function(id){
-    var path = Path.join(Data.dir, id);
+    var path = Path.join(Data.dir, ''+id);
 
     if(FS.existsSync(path))
       return path;
