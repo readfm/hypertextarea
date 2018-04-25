@@ -51,8 +51,11 @@ var pix = Pix = {
 			preloadGoogle: false
 		});
 
-		carousel.$t.appendTo(Pix.$pic);
+		var $carouselLast = $('#pic > .carousel:last-child');
+		carousel.$t.insertAfter($carouselLast[0] || $('#pix8-header'));
 		carousel.onTag(tag);
+
+		Pix8.resize();
 
 		return carousel;
 	},

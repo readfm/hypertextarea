@@ -9,7 +9,7 @@
 	display: inline-block;
 	width: calc(100% - 206px);
 	height: 100%;
-	-webkit-app-region: drag;
+	/* -webkit-app-region: drag; */
 }
 
 
@@ -37,7 +37,7 @@
 	display: inline-block;
 	width: calc(100% - 206px);
 	height: 100%;
-	-webkit-app-region: drag;
+	/* -webkit-app-region: drag; */
 }
 
 
@@ -54,7 +54,7 @@
 }
 
 #pic{
-	position: fixed;
+	/* position: fixed; */
 	top: 0;
 	left: 0;
 	right: 0;
@@ -171,7 +171,7 @@
     position: absolute;
     height: 30px;
     cursor: n-resize;
-    bottom: -1px;
+    /* bottom: -1px; */
     right: 0;
     left: 0;
     z-index: 200;

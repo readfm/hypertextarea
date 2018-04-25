@@ -11,12 +11,31 @@ window.Pix8 = {
     var $header = Pix8.$header = $("<div>", {id: 'pix8-header'}).prependTo($pic);
     var $title = $("<div>", {id: 'pic8-title'}).appendTo($header);
     var $url = $('<input>', {placeholder: 'URL', id: 'pix8-url'}).appendTo($title);
+    $url.bindEnter(function(ev){
+      $('#browser-window').attr('src', this.value);
+    });
 
     Pix8.initInput();
     Pix8.initList();
     if(window.isElectron)
       Pix8.iniElectron();
+
   },
+
+	resize: function(){
+		var height = $('#pic').height();
+
+    var h = 0;
+    $('#pic > *:visible').each(function(){
+      console.log($(this).css('position'));
+      if($(this).css('position') != 'absolute')
+        h += $(this).height();
+    });
+    $('#pic').height(h);
+		//chrome.storage.local.set({height: height});
+		//chrome.runtime.sendMessage({cmd: 'resize', height: height});
+		//Pix.leaveGap(height);
+	},
 
   initInput: function(){
     var $resize = $("<div id='pic-resize'></div>");
@@ -96,14 +115,6 @@ window.Pix8 = {
     this.addTag(view.id, view.tag);
   },
 
-  resize: function(){
-    return;
-		var height = $('#pic').height();
-		chrome.storage.local.set({height: height});
-		chrome.runtime.sendMessage({cmd: 'resize', height: height});
-		Pix.leaveGap(height);
-	},
-
   initList: function(){
     var $cont = this.$Pix8list = $('<div>', {id: 'pix8list'}).appendTo('#pic');
 
@@ -139,6 +150,8 @@ window.Pix8 = {
         });
 
       Pix.carousel(Cfg.name || 'pix8');
+
+      Pix8.resize();
     });
   },
 
@@ -161,8 +174,9 @@ window.Pix8 = {
       name: item.text,
     });
 
-    carousel.$t.appendTo(Pix.$pic);
+    carousel.$t.insertAfter($carouselLast[0] || $('#pix8-header'));
     carousel.onTag(item.text);
+    Pix8.resize();
   },
 
   addWord: function(){
