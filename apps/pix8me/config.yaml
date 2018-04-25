@@ -7,7 +7,7 @@ net:
     file: browse.html
 windows:
   index:
-    openDevTools: true
+    openDevTools: false
     maximize: true
     BrowserWindow:
       icon: logo.ico

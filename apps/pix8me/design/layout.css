@@ -28,6 +28,17 @@ body{
     height: 100%;
 }
 
+
+
+#pix8-url{
+   width: 100%;
+   background: transparent;
+   height: 100%;
+   margin: 0;
+   border: 0;
+   color: white;
+}
+
 #gg{
     height: 100%;
     width: 100%; 

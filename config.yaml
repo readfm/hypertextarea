@@ -30,7 +30,7 @@ window:
     width: 1800
     height: 900
     useContentSize: true
-    title: NoToSpy
+    title: home
     webPreferences:
       plugins: true
       blinkFeatures: 'OverlayScrollbars'

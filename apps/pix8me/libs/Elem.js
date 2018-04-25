@@ -168,10 +168,11 @@ $.extend(module.prototype, {
 			thumb = 'http://img.youtube.com/vi/'+video.id+'/sddefault.jpg';
 		else{
 			var u = this.item.src.split('://');
-			thumb = Cfg.thumb+u[0]+'/'+u[1];
+			//thumb = Cfg.thumb+u[0]+'/'+u[1];
+			thumb = this.item.src;
 		}
 
-		this.$item.css('background-image', 'url('+thumb+')');
+		//this.$item.css('background-image', 'url('+thumb+')');
 
 		return this.$thumb;
 	},

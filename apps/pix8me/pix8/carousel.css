@@ -9,7 +9,7 @@
 	display: inline-block;
 	width: calc(100% - 206px);
 	height: 100%;
-	-webkit-app-region: drag;
+	/* -webkit-app-region: drag; */
 }
 
 
@@ -37,7 +37,7 @@
 	display: inline-block;
 	width: calc(100% - 206px);
 	height: 100%;
-	-webkit-app-region: drag;
+	/* -webkit-app-region: drag; */
 }
 
 
@@ -357,7 +357,7 @@
 	display: inline-block;
 	width: calc(100% - 206px);
 	height: 100%;
-	-webkit-app-region: drag;
+	/* -webkit-app-region: drag; */
 	flex-grow: 1;
 }
 

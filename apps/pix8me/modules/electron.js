@@ -30,12 +30,14 @@ $(ev => {
     Pix8.init();
 
 
+    /*
     $(window).resize(function(event){
       var $lastCarousel = $('#pic > .carousel').last();
       if(!$lastCarousel.length) return;
       $lastCarousel.height($lastCarousel.height() + document.body.clientHeight - $('#pic').height());
       $lastCarousel[0].carousel.resize();
     });
+    */
   });
 
   //$(document).trigger('connected');

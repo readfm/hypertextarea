@@ -9,7 +9,8 @@ window.Pix8 = {
     var $pic = Pix.$pic = Pix8.$pic = Pix8.$cont = $("<div>", {id: 'pic', class: 'bar'}).prependTo('body');
 
     var $header = Pix8.$header = $("<div>", {id: 'pix8-header'}).prependTo($pic);
-    $("<div>", {id: 'pic8-title'}).appendTo($header);
+    var $title = $("<div>", {id: 'pic8-title'}).appendTo($header);
+    var $url = $('<input>', {placeholder: 'URL', id: 'pix8-url'}).appendTo($title);
 
     Pix8.initInput();
     Pix8.initList();
@@ -32,11 +33,17 @@ window.Pix8 = {
       $tag.focus();
     });
 
+
     this.enableInputDrag();
   },
 
   iniElectron: function(){
     var window = require('electron').remote.getCurrentWindow();
+
+    $("<button>", {id: 'pic8-devTools'}).click(ev => {
+      window.toggleDevTools();
+    }).html('&lt;&gt;').appendTo(Pix8.$header);
+
     $("<button>", {id: 'pic8-minimize'}).click(ev => {
       window.minimize();
     }).html('&minus;').appendTo(Pix8.$header);
