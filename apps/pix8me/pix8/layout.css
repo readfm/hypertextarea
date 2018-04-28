@@ -13,9 +13,9 @@ body{
 
 #youtube{
     height: 100%;
-    width: 100%;   
+    width: 100%;
     margin: 0;
-    border: 0; 
+    border: 0;
 }
 
 #frames{
@@ -31,7 +31,6 @@ body{
 }
 
 
-
 #pix8-url{
    width: 100%;
    background: transparent;
@@ -43,7 +42,7 @@ body{
 
 #gg{
     height: 100%;
-    width: 100%; 
+    width: 100%;
     margin: 0;
     object-fit: contain;
 }

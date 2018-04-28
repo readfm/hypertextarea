@@ -195,7 +195,8 @@ Carousel.prototype = {
 				});
 			}, 500);
 
-			img.onerror = function(){
+			img.onerror = function(ev){
+				console.log(ev);
 				if(item.type == 'link'){
 					clearInterval(intr);
 					console.error('Unable to load image: '+img.src);

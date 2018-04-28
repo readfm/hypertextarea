@@ -206,6 +206,7 @@
 	height: 200px;
 	white-space: nowrap;
 	overflow-wrap: normal;
+	background: rgba(0, 0, 0, 0.13);
 	overflow-x: hidden;
 	/* transition: margin-left 1s, height 0.5s; */
 	-webkit-overflow-scrolling: touch;

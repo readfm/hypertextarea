@@ -174,6 +174,11 @@ window.Pix8 = {
       name: item.text,
     });
 
+
+  	var $carouselLast = $('#pic > .carousel').last();
+
+    console.log($carouselLast[0]);
+
     carousel.$t.insertAfter($carouselLast[0] || $('#pix8-header'));
     carousel.onTag(item.text);
     Pix8.resize();

@@ -51,7 +51,7 @@ var pix = Pix = {
 			preloadGoogle: false
 		});
 
-		var $carouselLast = $('#pic > .carousel:last-child');
+		var $carouselLast = $('#pic > .carousel').last();
 		carousel.$t.insertAfter($carouselLast[0] || $('#pix8-header'));
 		carousel.onTag(tag);
 
@@ -111,6 +111,7 @@ var pix = Pix = {
 
 	// send request to socket or to background app if its chrome extension
 	send: function(m, cb){
+		return;
 		if(typeof ws != "undefined" && ws instanceof WS)
 			ws.send(m, cb);
 		else
