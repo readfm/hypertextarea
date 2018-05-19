@@ -1,59 +1,44 @@
-const path = require('path'),
-      fs = require('fs'),
-      yaml = require('js-yaml'),
-      url = require('url'),
-      {app, BrowserWindow} = require('electron');
+$("<link>", {
+  "rel" : "stylesheet",
+  "type" :  "text/css",
+  "href" : "electron.css"
+}).appendTo('head');
 
 
-global.Electron = exports = {
-  active: {},
-  createWindow: function(name){
-    console.log('Creating window: ', name);
+$(ev => {
+  document.addEventListener("keydown", e => {
+    if (e.which === 123)
+      require('remote').getCurrentWindow().toggleDevTools();
+    else if (e.which === 116)
+      location.reload();
+  });
 
-    var makePath = file => path.join(App.path, 'static', name, file);
+  $(document).on('click', 'a[target="_blank"]', function (event){
+    event.preventDefault();
+    console.log(this);
+    require('electron').shell.openExternal(this.href);
+  });
+});
 
-    var cfg_path = makePath('app.yaml'),
-        cfg_text = fs.existsSync(cfg_path)? fs.readFileSync(cfg_path, 'utf8'):null,
-        cfg = _.extend(Cfg.electron.window, yaml.safeLoad(cfg_text));
+$(ev => {
+  Context.init();
+  User.id = Remote.getGlobal('Me').id;
 
-    console.log(cfg);
+  Data.load(User.id).then(item => {
+    User.item = item || {id: User.id};
 
-    let win = this.active[name] = new BrowserWindow(cfg.window);
+    Pix8.init();
 
-    win.loadURL(makePath('index.html'));
 
-    if(cfg.openDevTools)
-      win.webContents.openDevTools();
-
-    win.setMenu(null);
-
-    win.on('closed', () => {
-      win = this.active[name] = null;
+    /*
+    $(window).resize(function(event){
+      var $lastCarousel = $('#pic > .carousel').last();
+      if(!$lastCarousel.length) return;
+      $lastCarousel.height($lastCarousel.height() + document.body.clientHeight - $('#pic').height());
+      $lastCarousel[0].carousel.resize();
     });
-  },
+    */
+  });
 
-  init: function(){
-    var that = this;
-    // Quit when all windows are closed.
-
-    app.on('ready', () => {
-      that.createWindow(process.argv[2] || Cfg.default_app || 'home');
-    });
-
-    app.on('window-all-closed', () => {
-      // On macOS it is common for applications and their menu bar
-      // to stay active until the user quits explicitly with Cmd + Q
-      if (process.platform !== 'darwin') {
-        app.quit();
-      }
-    })
-
-    app.on('activate', () => {
-      // On macOS it's common to re-create a window in the app when the
-      // dock icon is clicked and there are no other windows open.
-      if (win === null) {
-        that.createWindow(Cfg.default_app)
-      }
-    });
-  }
-};
+  //$(document).trigger('connected');
+});

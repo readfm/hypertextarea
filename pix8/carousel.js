@@ -985,7 +985,7 @@ Carousel.prototype = {
 				else{
 					filter.type = 'public';
 					delete filter.owner;
-
+					
 					Pix.send({
 						cmd: 'get',
 						filter: filter,

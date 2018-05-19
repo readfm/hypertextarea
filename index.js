@@ -14,13 +14,9 @@ $(function(ev){
 
 	S.session = m => {
 		Cookies.set('sid', m.sid);
-		User.id = m.my_id;
+		User.id = m.my_id || '301eb8dfd94c9ff93ce7bb97eb7f8429ee5f3e94b3682b0a695247e68e3b49bf';
 
-		Data.load(User.id).then(item => {
-			User.item = item || {id: User.id};
-
- 			Pix8.init();
-		});
+ 		Pix8.init();
 		//if(m.user) acc.ok(m.user);
 
 		$(document).trigger('connected');

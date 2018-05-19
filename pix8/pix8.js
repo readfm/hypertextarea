@@ -128,14 +128,7 @@ window.Pix8 = {
   initWords: function(){
     var $cont = this.$Pix8list_words = $('<div>', {id: 'pix8list_words'}).appendTo(this.$Pix8list);
 
-    if(User.item.words_id)
-      Pix8.loadWords(User.item.words_id);
-    else {
-      Data.log('').then(id => {
-        User.update({words_id: id});
-        Pix8.loadWords(id);
-      })
-    }
+    Pix8.loadWords();
   },
 
   words: {},

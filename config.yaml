@@ -1,36 +1,24 @@
 ---
-modules: [functions, query, http, ws, data, me]
-default_app: pix8me
-developer_mode: true
-
-port: 5030
-
-socket:
-  port: 3000
-
-
-Data:
-  host: http://127.0.0.1
-  port: 8083
-
-electronSwitches:
-  # 'enable-tcp-fastopen'
-  - enable-experimental-canvas-features
-  - enable-experimental-web-platform-features
-  - enable-overlay-scrollbars
-  # 'enable-hardware-overlays'
-  # 'enable-universal-accelerated-overflow-scroll'
-  # 'allow-file-access-from-files'
-  # 'allow-insecure-websocket-from-https-origin'
-  - ['js-flags', '--harmony_collections']
-
-window:
-  openDevTools: true
-  BrowserWindow:
-    width: 1800
-    height: 900
-    useContentSize: true
-    title: home
-    webPreferences:
-      plugins: true
-      blinkFeatures: 'OverlayScrollbars'
+name: pix8
+httpAccess: true
+net:
+  site:
+    port: 8040
+    file: browse.html
+windows:
+  index:
+    openDevTools: false
+    maximize: true
+    BrowserWindow:
+      icon: logo.ico
+      frame: false
+      show: false
+      titleBarStyle: hiddenInset
+      width: 1800
+      height: 300
+      useContentSize: true
+      title: Pix8
+      webPreferences:
+        plugins: true
+        blinkFeatures: 'OverlayScrollbars'
+    file: electron.html
