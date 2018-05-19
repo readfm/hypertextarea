@@ -111,8 +111,13 @@ window.Pix8 = {
   },
 
   linkView: function(view){
-    Data.log(view.id + ' ' + view.tag, User.item.words_id);
-    this.addTag(view.id, view.tag);
+    W({
+      cmd: 'save',
+      path: 'words.log',
+      log: view.id + ' ' + view.tag
+    }, r => {
+      this.addTag(view.id, view.tag);
+    });
   },
 
   initList: function(){
@@ -133,14 +138,15 @@ window.Pix8 = {
 
   words: {},
   loadWords: function(id){
-    Data.load(id).then(item => {
-      if(item && item.length)
-        item.forEach(line => {
+    W({cmd: 'load', path: 'words.log'}, r => {
+      if(r.item && r.item.length){
+        r.item.forEach(line => {
           var l = line.split(' ');
           this.words[l[1]] = l[0];
 
           Pix8.addTag(l[0], l[1]);
         });
+      }
 
       Pix.carousel(Cfg.name || 'pix8');
 
