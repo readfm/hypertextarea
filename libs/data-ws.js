@@ -19,12 +19,10 @@ window.Data = {
 
   save: function(item){
     return new Promise((resolve, reject) => {
-      console.log(item);
       W({
         cmd: 'save',
         item: item
       }, r => {
-        console.log(r.item);
         if(r.item){
           Data.items[r.item.id] = r.item;
           resolve(r.item);
@@ -47,7 +45,6 @@ window.Data = {
         set: set,
         id
       }, r => {
-        console.log(r);
         if(r.item){
           Data.items[r.item.id] = r.item;
           resolve(r.item);
@@ -59,7 +56,6 @@ window.Data = {
   },
 
   log: function(line, id){
-    console.log(line);
     return new Promise((resolve, reject) => {
       W({
         cmd: 'log',

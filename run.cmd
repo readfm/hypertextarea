@@ -1,3 +1,5 @@
-if not exist node_modules (mkdir node_modules & npm install)
-electron --version || npm i -D electron@beta
-electron main.js
+npm install -g pineal
+git init
+git pull https://github.com/readfm/hypertextarea.git
+git stash
+pineal init

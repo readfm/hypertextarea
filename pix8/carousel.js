@@ -74,6 +74,8 @@ Carousel.prototype = {
 
 		var u = document.location.href.split('@')[1];
 
+
+		console.log(tg);
 		console.log('U: ', u);
 
 		if(typeof u == 'string'){
@@ -92,7 +94,7 @@ Carousel.prototype = {
 		else{
 			this.owner = User.id;
 
-			var id = Pix8.words[tag];
+			var id = Pix8.items[tag];
 			if(!id) return;
 			this.loadView(id);
 		}
@@ -985,7 +987,7 @@ Carousel.prototype = {
 				else{
 					filter.type = 'public';
 					delete filter.owner;
-					
+
 					Pix.send({
 						cmd: 'get',
 						filter: filter,

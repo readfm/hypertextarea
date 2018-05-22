@@ -111,12 +111,17 @@ window.Pix8 = {
   },
 
   linkView: function(view){
+    if(!view.path) return;
+    if(view.path.indexOf('file://') + 1) return;
+
+    var filePath = (view.path.indexOf('http') == 0)?'sites.log':'words.log';
     W({
       cmd: 'save',
-      path: 'words.log',
-      log: view.id + ' ' + view.tag
+      path: filePath,
+      log: view.id + ' ' + view.path
     }, r => {
-      this.addTag(view.id, view.tag);
+      this.items[view.path] = view.id;
+      this['add' + ((view.path.indexOf('http') == 0)?'Site':'Tag')](view.id, view.path);
     });
   },
 
@@ -127,6 +132,7 @@ window.Pix8 = {
       $cont.toggle();
     }).html("&#8803").prependTo(Pix8.$header);
 
+    this.initSites();
     this.initWords();
   },
 
@@ -136,13 +142,39 @@ window.Pix8 = {
     Pix8.loadWords();
   },
 
+  initSites: function(){
+    var $cont = this.$Pix8list_sites = $('<div>', {id: 'pix8list_sites'}).appendTo(this.$Pix8list);
+
+    W({cmd: 'load', path: 'sites.log'}, r => {
+      if(r.item && r.item.length){
+        r.item.forEach(line => {
+          var l = line.split(' ');
+
+          Pix8.addSite(l[0], l[1]);
+        });
+      }
+    });
+  },
+
+  addSite: function(id, text){
+    this.sites[text] = id;
+    this.items[text] = id;
+
+    var $item = $('<a>', {href: text});
+    $item.text(text).data({id, text});
+    $item.click(ev => Pix8.clickTag(ev));
+    $('#pix8list_sites').prepend($item);
+    return $item;
+  },
+
+  sites: {},
   words: {},
+  items: {},
   loadWords: function(id){
     W({cmd: 'load', path: 'words.log'}, r => {
       if(r.item && r.item.length){
         r.item.forEach(line => {
           var l = line.split(' ');
-          this.words[l[1]] = l[0];
 
           Pix8.addTag(l[0], l[1]);
         });
@@ -157,30 +189,38 @@ window.Pix8 = {
   addTag: function(id, text){
     var $item = this.buildTag(id, text);
     this.words[text] = id;
+    this.items[text] = id;
     $('#pix8list_words').prepend($item);
   },
 
   buildTag: function(id, text){
     var $item = $('<a>');
     $item.text(text).data({id, text});
-    $item.click(Pix8.clickTag);
+    $item.click(ev => Pix8.clickTag(ev));
     return $item;
   },
 
   clickTag: function(ev){
-    var item = $(this).data();
+    ev.preventDefault();
+
+
+    var item = $(ev.target).data();
+
     var carousel = new Carousel({
       name: item.text,
     });
 
+    this.$Pix8list.hide();
 
   	var $carouselLast = $('#pic > .carousel').last();
-
-    console.log($carouselLast[0]);
 
     carousel.$t.insertAfter($carouselLast[0] || $('#pix8-header'));
     carousel.onTag(item.text);
     Pix8.resize();
+
+
+    if(item.text.indexOf('http') == 0)
+      $('#pix8-url').val(item.text);
   },
 
   addWord: function(){

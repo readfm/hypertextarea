@@ -29,27 +29,31 @@ window.Central = {
         sort: {updated: -1},
         collection: 'pix8'
       }, function(r){
-        if(!r.items || !r.items.length) return resolve();
+        if(Pix8.items[path] === true)
+          delete Pix8.items[path];
+
+        if(!r.items || !r.items.length){
+          return resolve();
+        }
 
         var view = r.items[0];
         view.tag = path;
         var ids = [];
 
-        view = Data.saveSync(view);
-
+        Data.save(view);
 
         if(view.items)
           Central.W({
             cmd: 'load',
             filter: {
               id: {$in: view.items},
-              type: 'image'
             },
             collection: 'pix8'
           }, function(r){
             var ids = [];
             (r.items || []).forEach(item => {
-              Data.saveSync(item);
+              if(item.file) console.log('File:', item.file);
+              Data.save(item);
             });
 
             Pix8.linkView(view);
@@ -57,30 +61,36 @@ window.Central = {
 
             resolve();
           });
+        else
+          resolve();
       });
     });
   },
 
-  collectWord: function(){
-    if(!Central.words || !Central.words.length) return;
+  items: [],
+  collect: function(){
+    if(!Central.items || !Central.items.length) return;
 
-    var view = Central.words.pop();
-    if(view.path && !Pix8.words[view.path]){
-      Central.fetchView(view.path).then(Central.collectWord);
+    var view = Central.items.pop();
+    if(view.path && !Pix8.items[view.path]){
+      Pix8.items[view.path] = true;
+      Central.fetchView(view.path).then(Central.collect);
     }
     else{
       console.log('Already: ', view.path);
-      Central.collectWord();
+      Central.collect();
     }
   },
 
-  loadWords: function(){
+  list: function(filter){
+    filter = $.extend({
+    //  path: {$regex: "^(?!http).+"},
+      type: "view",
+      owner: 'dukecr'
+    }, filter);
+
     Central.W({
-      cmd: 'load',
-      filter: {
-        path: {$regex: "^(?!http).+"},
-        type: "view"
-      },
+      cmd: 'load', filter,
       sort: {
         updated: -1, time: -1
       },
@@ -90,9 +100,9 @@ window.Central = {
       },
       collection: 'pix8'
     }, r => {
-      Central.words = r.items;
+      Central.items = r.items;
 
-      Central.collectWord();
+      Central.collect();
     });
   }
 }
